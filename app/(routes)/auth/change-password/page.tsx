@@ -75,8 +75,8 @@ export default function ChangePassword() {
         </Link>
 
         <div className="text-center mb-8">
-          <div className="mx-auto w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-4">
-            <Lock className="h-6 w-6 text-orange-600" />
+          <div className="mx-auto w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+            <Lock className="h-6 w-6 text-purple-600" />
           </div>
           <h1 className="text-2xl font-bold">Change Password</h1>
           <p className="text-gray-500 mt-2">Update your account password</p>
@@ -138,7 +138,7 @@ export default function ChangePassword() {
 
           <Button
             type="submit"
-            className="w-full bg-orange-600 hover:bg-orange-700"
+            className="w-full bg-purple-600 hover:bg-purple-700"
             disabled={isLoading}
           >
             {isLoading ? "Updating..." : "Update Password"}

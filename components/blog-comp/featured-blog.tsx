@@ -35,7 +35,7 @@ export default function FeaturedBlog({
           <p className="text-gray-200 mb-6 max-w-3xl">{description}</p>
           <Link
             href={`/blog/${id}`}
-            className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md transition-colors"
+            className="inline-block bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-md transition-colors"
           >
             Read More
           </Link>

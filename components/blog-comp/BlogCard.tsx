@@ -56,7 +56,7 @@ export default function BlogCard({
       </div>
       <div className="space-y-2">
         <Link href={`/blog/${id}`}>
-          <h3 className="font-bold text-lg group-hover:text-orange-500 transition-colors">
+          <h3 className="font-bold text-lg group-hover:text-purple-500 transition-colors">
             {title}
           </h3>
         </Link>
@@ -74,7 +74,7 @@ export default function BlogCard({
         <div className="pt-2">
           <Link
             href={`/blog/${id}`}
-            className="text-sm font-medium text-orange-500 hover:text-orange-600 transition-colors"
+            className="text-sm font-medium text-purple-500 hover:text-purple-600 transition-colors"
           >
             Read More
           </Link>

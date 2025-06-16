@@ -61,28 +61,28 @@ export default function Footer() {
             <div className="flex space-x-4 pt-4">
               <Link
                 href="#"
-                className="hover:text-orange-400 transition-colors"
+                className="hover:text-purple-400 transition-colors"
               >
                 <Twitter className="h-5 w-5" />
                 <span className="sr-only">Twitter</span>
               </Link>
               <Link
                 href="#"
-                className="hover:text-orange-400 transition-colors"
+                className="hover:text-purple-400 transition-colors"
               >
                 <Facebook className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </Link>
               <Link
                 href="#"
-                className="hover:text-orange-400 transition-colors"
+                className="hover:text-purple-400 transition-colors"
               >
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
               </Link>
               <Link
                 href="#"
-                className="hover:text-orange-400 transition-colors"
+                className="hover:text-purple-400 transition-colors"
               >
                 <Youtube className="h-5 w-5" />
                 <span className="sr-only">YouTube</span>

@@ -33,11 +33,11 @@ export default function CareersSection() {
             <div>
               <h3 className="text-2xl font-bold mb-6">
                 Ready to conquer{" "}
-                <span className="text-orange-500">the best?</span>
+                <span className="text-purple-500">the best?</span>
               </h3>
               <Link
                 href="job"
-                className="p-3 rounded-md bg-orange-500 hover:bg-orange-600 text-white"
+                className="p-3 rounded-md bg-purple-500 hover:bg-purple-600 text-white"
               >
                 Explore job Requests
               </Link>

@@ -35,7 +35,7 @@ export default function HiwotFundCTA() {
               </p>
               <Link
                 href="/hiwot"
-                className="bg-orange-500 p-3 rounded-md hover:bg-orange-600 text-white"
+                className="bg-purple-500 p-3 rounded-md hover:bg-purple-600 text-white"
               >
                 Learn more
               </Link>

@@ -1,38 +1,40 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { MapPin, Briefcase } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
-import { CandidateCardProps } from "@/types/jobApi"
-import placeholderimg from '@/public/person-placeholder.png'
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { MapPin, Briefcase } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { CandidateCardProps } from "@/types/jobApi";
+import placeholderimg from "@/public/person-placeholder.png";
 
-
-
-export default function CandidateCard({ candidate, index, layout }: CandidateCardProps) {
-  const router = useRouter()
+export default function CandidateCard({
+  candidate,
+  index,
+  layout,
+}: CandidateCardProps) {
+  const router = useRouter();
 
   const handleSeeMore = () => {
-    router.push(`/job/detail/${candidate.id}`)
-  }
+    router.push(`/job/detail/${candidate.id}`);
+  };
 
   const getEmploymentTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
       case "fulltime":
-        return "text-green-500 bg-green-50"
+        return "text-green-500 bg-green-50";
       case "parttime":
-        return "text-blue-500 bg-blue-50"
+        return "text-blue-500 bg-blue-50";
       case "remote":
-        return "text-purple-500 bg-purple-50"
+        return "text-purple-500 bg-purple-50";
       case "internship":
-        return "text-orange-500 bg-orange-50"
+        return "text-purple-500 bg-purple-50";
       case "contract":
-        return "text-gray-500 bg-gray-50"
+        return "text-gray-500 bg-gray-50";
       default:
-        return "text-gray-500 bg-gray-50"
+        return "text-gray-500 bg-gray-50";
     }
-  }
+  };
 
   if (layout === "list") {
     return (
@@ -62,7 +64,9 @@ export default function CandidateCard({ candidate, index, layout }: CandidateCar
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
               <span
-                className={`text-xs px-2 py-1 rounded-full flex items-center ${getEmploymentTypeColor(candidate.typeOfEmployment)}`}
+                className={`text-xs px-2 py-1 rounded-full flex items-center ${getEmploymentTypeColor(
+                  candidate.typeOfEmployment
+                )}`}
               >
                 <Briefcase size={10} className="mr-1" />
                 {candidate.typeOfEmployment}
@@ -72,13 +76,13 @@ export default function CandidateCard({ candidate, index, layout }: CandidateCar
         </div>
         <Button
           variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50 w-full sm:w-auto"
+          className="text-purple-500 border-purple-500 hover:bg-purple-50 w-full sm:w-auto"
           onClick={handleSeeMore}
         >
           See More
         </Button>
       </motion.div>
-    )
+    );
   }
 
   return (
@@ -108,7 +112,9 @@ export default function CandidateCard({ candidate, index, layout }: CandidateCar
       </div>
       <div className="flex flex-wrap gap-2 mb-4">
         <span
-          className={`text-xs px-2 py-1 rounded-full flex items-center ${getEmploymentTypeColor(candidate.typeOfEmployment)}`}
+          className={`text-xs px-2 py-1 rounded-full flex items-center ${getEmploymentTypeColor(
+            candidate.typeOfEmployment
+          )}`}
         >
           <Briefcase size={10} className="mr-1" />
           {candidate.typeOfEmployment}
@@ -116,11 +122,11 @@ export default function CandidateCard({ candidate, index, layout }: CandidateCar
       </div>
       <Button
         variant="outline"
-        className="text-orange-500 border-orange-500 hover:bg-orange-50 mt-auto"
+        className="text-purple-500 border-purple-500 hover:bg-purple-50 mt-auto"
         onClick={handleSeeMore}
       >
         See More
       </Button>
     </motion.div>
-  )
+  );
 }

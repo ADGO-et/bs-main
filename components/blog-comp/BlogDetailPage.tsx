@@ -168,7 +168,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
         <div className="mb-6">
           <Link
             href="/blog"
-            className="inline-flex items-center text-gray-600 hover:text-orange-500 transition-colors"
+            className="inline-flex items-center text-gray-600 hover:text-purple-500 transition-colors"
           >
             <ArrowLeft size={16} className="mr-2" />
             Back to Blogs
@@ -236,7 +236,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                   href={blog.referenceLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-orange-500 hover:underline"
+                  className="text-purple-500 hover:underline"
                 >
                   {blog.referenceLink}
                 </a>

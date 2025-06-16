@@ -105,7 +105,7 @@ export default function ProjectList({
             <Button
               variant="outline"
               size="icon"
-              className={`h-8 w-8 ${layout === "grid" ? "bg-orange-50" : ""}`}
+              className={`h-8 w-8 ${layout === "grid" ? "bg-purple-50" : ""}`}
               onClick={() => onLayoutChange("grid")}
             >
               <svg
@@ -128,7 +128,7 @@ export default function ProjectList({
             <Button
               variant="outline"
               size="icon"
-              className={`h-8 w-8 ${layout === "list" ? "bg-orange-50" : ""}`}
+              className={`h-8 w-8 ${layout === "list" ? "bg-purple-50" : ""}`}
               onClick={() => onLayoutChange("list")}
             >
               <svg
@@ -152,7 +152,7 @@ export default function ProjectList({
             </Button>
           </div>
           <Button
-            className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto"
+            className="bg-purple-500 hover:bg-purple-600 text-white w-full sm:w-auto"
             onClick={handlePost}
           >
             Post a Project

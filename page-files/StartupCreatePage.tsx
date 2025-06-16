@@ -54,6 +54,7 @@ export default function StartupCreatePage() {
       city: "",
       state: "",
     },
+    donarType: "single",
     foundedAt: "",
     numberOfEmployees: "",
     videoLink: "",
@@ -116,7 +117,8 @@ export default function StartupCreatePage() {
       !formData.startupName ||
       !formData.description ||
       !formData.license ||
-      !formData.goalFund
+      !formData.goalFund ||
+      !formData.donarType
     ) {
       toast({
         title: "Missing information",
@@ -143,6 +145,7 @@ export default function StartupCreatePage() {
       formDataToSend.append("license", formData.license);
       formDataToSend.append("website", formData.website);
       // if (formData.logo) formDataToSend.append("logo", formData.logo);
+      formDataToSend.append("donarType", formData.donorType);
       formDataToSend.append("goalFund", formData.goalFund);
       formDataToSend.append("typeOfSupport", formData.typeOfSupport);
       formDataToSend.append("bankName", formData.bankName);
@@ -182,7 +185,7 @@ export default function StartupCreatePage() {
 
   return (
     <div className="min-h-screen pt-24 pb-16 relative overflow-hidden">
-      <div className="absolute -left-40 top-0 opacity-10">
+      {/* <div className="absolute -left-40 top-0 opacity-10">
         <svg
           width="400"
           height="400"
@@ -215,9 +218,9 @@ export default function StartupCreatePage() {
             fill="none"
           />
         </svg>
-      </div>
+      </div> */}
 
-      <div className="absolute -right-40 bottom-0 opacity-10">
+      {/* <div className="absolute -right-40 bottom-0 opacity-10">
         <svg
           width="400"
           height="400"
@@ -250,7 +253,7 @@ export default function StartupCreatePage() {
             fill="none"
           />
         </svg>
-      </div>
+      </div> */}
 
       <div className="container mx-auto px-4 max-w-3xl">
         <motion.div
@@ -307,16 +310,23 @@ export default function StartupCreatePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="license" className="text-sm font-medium">
-                  Business License Number*
+                <Label htmlFor="typeOfSupport" className="text-sm font-medium">
+                  Donor Type*
                 </Label>
-                <Input
-                  id="license"
-                  name="license"
-                  value={formData.license}
-                  onChange={handleInputChange}
-                  required
-                />
+                <Select
+                  value={formData.donarType}
+                  onValueChange={(value) =>
+                    handleSelectChange("donorTypes", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select support type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="funding">Only one donor</SelectItem>
+                    <SelectItem value="mentorship">Multiple donor</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="website" className="text-sm font-medium">
@@ -362,11 +372,6 @@ export default function StartupCreatePage() {
                     />
                   </label>
                 </div>
-                {/* {logoName && (
-                  <div className="mt-2 text-sm text-gray-600">
-                    Selected file: {logoName}
-                  </div>
-                )} */}
               </div>
             </div>
 
@@ -470,11 +475,7 @@ export default function StartupCreatePage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Technology">Technology</SelectItem>
-                    <SelectItem value="Healthcare">Healthcare</SelectItem>
-                    <SelectItem value="Finance">Finance</SelectItem>
-                    <SelectItem value="Education">Education</SelectItem>
-                    <SelectItem value="Agriculture">Agriculture</SelectItem>
-                    <SelectItem value="Manufacturing">Manufacturing</SelectItem>
+                    <SelectItem value="Healthcare">Non Technology</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -657,7 +658,7 @@ export default function StartupCreatePage() {
               >
                 By clicking this you are confirming that you have read,
                 understand, and agree with the{" "}
-                <Link href="/terms" className="text-orange-500 hover:underline">
+                <Link href="/terms" className="text-purple-500 hover:underline">
                   Terms and Conditions
                 </Link>
               </Label>
@@ -667,7 +668,7 @@ export default function StartupCreatePage() {
             <div className="pt-4">
               <Button
                 type="submit"
-                className="bg-orange-500 hover:bg-orange-600 text-white"
+                className="bg-purple-500 hover:bg-purple-600 text-white"
                 // disabled={isLoading}
               >
                 {/* {isLoading ? "Submitting..." : "Submit Startup"} */}

@@ -8,7 +8,7 @@ import imgg2 from "@/public/carrer.svg";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen pt-40 pb-16 relative overflow-hidden">
+    <div className="min-h-screen pt-44 pb-16 relative overflow-hidden">
       {/* Background patterns */}
       <div className="absolute -left-40 top-0 opacity-10">
         <svg
@@ -83,9 +83,9 @@ export default function AboutPage() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 md:mb-24">
           <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="h-0.5 w-12 bg-orange-500"></div>
+            <div className="h-0.5 w-12 bg-purple-500"></div>
             <h1 className="text-3xl md:text-4xl font-bold">About Us</h1>
-            <div className="h-0.5 w-12 bg-orange-500"></div>
+            <div className="h-0.5 w-12 bg-purple-500"></div>
           </div>
         </div>
 
@@ -118,7 +118,7 @@ export default function AboutPage() {
                 "Fast approval and disbursement process",
               ].map((item, index) => (
                 <div key={index} className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="h-5 w-5 text-purple-500 mt-0.5 flex-shrink-0" />
                   <p>{item}</p>
                 </div>
               ))}
@@ -149,19 +149,19 @@ export default function AboutPage() {
               title: "Our Mission",
               description:
                 "To democratize access to funding and empower individuals and businesses to achieve their financial goals through innovative solutions.",
-              icon: <Target className="h-10 w-10 text-orange-500" />,
+              icon: <Target className="h-10 w-10 text-purple-500" />,
             },
             {
               title: "Our Vision",
               description:
                 "To become the world's most trusted funding platform, known for our integrity, innovation, and commitment to client success.",
-              icon: <Award className="h-10 w-10 text-orange-500" />,
+              icon: <Award className="h-10 w-10 text-purple-500" />,
             },
             {
               title: "Our Values",
               description:
                 "Integrity, transparency, innovation, and client-centricity guide everything we do. We believe in building lasting relationships based on trust.",
-              icon: <Users className="h-10 w-10 text-orange-500" />,
+              icon: <Users className="h-10 w-10 text-purple-500" />,
             },
           ].map((item, index) => (
             <motion.div
@@ -252,9 +252,9 @@ export default function AboutPage() {
           ].map((stat, index) => (
             <div
               key={index}
-              className="bg-orange-50 p-6 rounded-lg text-center"
+              className="bg-purple-50 p-6 rounded-lg text-center"
             >
-              <div className="text-3xl md:text-4xl font-bold text-orange-500 mb-2">
+              <div className="text-3xl md:text-4xl font-bold text-purple-500 mb-2">
                 {stat.value}
               </div>
               <div className="text-gray-600">{stat.label}</div>

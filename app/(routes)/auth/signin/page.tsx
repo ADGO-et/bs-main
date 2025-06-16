@@ -15,8 +15,7 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "@/redux/authSlice";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import logo from "@/public/logo/logo.svg"
-
+import logo from "@/public/logo/logo.svg";
 
 export default function SignIn() {
   const [email, setEmail] = useState("test@example.com");
@@ -89,7 +88,7 @@ export default function SignIn() {
                 <Label htmlFor="password">Password</Label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-xs text-orange-600 hover:underline"
+                  className="text-xs text-purple-600 hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -117,7 +116,7 @@ export default function SignIn() {
 
             <Button
               type="submit"
-              className="w-full bg-orange-600 hover:bg-orange-700"
+              className="w-full bg-purple-600 hover:bg-purple-700"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign in"}
@@ -127,7 +126,7 @@ export default function SignIn() {
               Don&apos;t have an account?{" "}
               <Link
                 href="/auth/signup"
-                className="text-orange-600 hover:underline font-medium"
+                className="text-purple-600 hover:underline font-medium"
               >
                 Sign up
               </Link>
@@ -137,7 +136,7 @@ export default function SignIn() {
       </div>
 
       {/* Right side - Image */}
-      <div className="hidden md:block w-1/2 bg-orange-50 relative">
+      <div className="hidden md:block w-1/2 bg-purple-50 relative">
         <div className="absolute inset-0 flex items-center justify-center p-12">
           <div className="max-w-md">
             <Image

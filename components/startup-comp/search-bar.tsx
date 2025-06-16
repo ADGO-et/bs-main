@@ -1,17 +1,23 @@
-"use client"
+"use client";
 
-import { Search, MapPin } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
+import { Search, MapPin } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 interface SearchBarProps {
-  searchTerm: string
-  location: string
-  locations: { id: string; label: string }[]
-  onSearchChange: (value: string) => void
-  onLocationChange: (value: string) => void
-  onSearch: () => void
+  searchTerm: string;
+  location: string;
+  locations: { id: string; label: string }[];
+  onSearchChange: (value: string) => void;
+  onLocationChange: (value: string) => void;
+  onSearch: () => void;
 }
 
 export default function SearchBar({
@@ -25,7 +31,10 @@ export default function SearchBar({
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <div className="relative flex-grow">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+        <Search
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          size={20}
+        />
         <Input
           type="text"
           placeholder="Search by project name or description"
@@ -35,7 +44,10 @@ export default function SearchBar({
         />
       </div>
       <div className="relative md:w-1/3">
-        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+        <MapPin
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          size={20}
+        />
         <Select value={location} onValueChange={onLocationChange}>
           <SelectTrigger className="pl-10">
             <SelectValue placeholder="Select location" />
@@ -50,9 +62,12 @@ export default function SearchBar({
           </SelectContent>
         </Select>
       </div>
-      <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={onSearch}>
+      <Button
+        className="bg-purple-500 hover:bg-purple-600 text-white"
+        onClick={onSearch}
+      >
         Search
       </Button>
     </div>
-  )
+  );
 }

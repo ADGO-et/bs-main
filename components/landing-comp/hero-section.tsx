@@ -1,38 +1,130 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { motion } from "framer-motion"
-import collab from '@/public/collab.svg'
+import { useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import collab from "@/public/collab.svg";
 
 export default function HeroSection() {
-  const [searchQuery, setSearchQuery] = useState("")
-
   return (
-    <section className="relative pt-40 pb-16 overflow-hidden">
+    <section className="relative pt-44 pb-16 overflow-hidden">
       {/* Background pattern */}
       <div className="absolute -left-40 top-0 opacity-10">
-        <svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="200" cy="200" r="200" stroke="#FFA500" strokeWidth="0.5" fill="none" />
-          <circle cx="200" cy="200" r="180" stroke="#FFA500" strokeWidth="0.5" fill="none" />
-          <circle cx="200" cy="200" r="160" stroke="#FFA500" strokeWidth="0.5" fill="none" />
-          <circle cx="200" cy="200" r="140" stroke="#FFA500" strokeWidth="0.5" fill="none" />
-          <circle cx="200" cy="200" r="120" stroke="#FFA500" strokeWidth="0.5" fill="none" />
-          <circle cx="200" cy="200" r="100" stroke="#FFA500" strokeWidth="0.5" fill="none" />
+        <svg
+          width="400"
+          height="400"
+          viewBox="0 0 400 400"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="200"
+            cy="200"
+            r="200"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="180"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="160"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="140"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="120"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="100"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
         </svg>
       </div>
 
       <div className="absolute -right-40 bottom-0 opacity-10">
-        <svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="200" cy="200" r="200" stroke="#FFA500" strokeWidth="0.5" fill="none" />
-          <circle cx="200" cy="200" r="180" stroke="#FFA500" strokeWidth="0.5" fill="none" />
-          <circle cx="200" cy="200" r="160" stroke="#FFA500" strokeWidth="0.5" fill="none" />
-          <circle cx="200" cy="200" r="140" stroke="#FFA500" strokeWidth="0.5" fill="none" />
-          <circle cx="200" cy="200" r="120" stroke="#FFA500" strokeWidth="0.5" fill="none" />
-          <circle cx="200" cy="200" r="100" stroke="#FFA500" strokeWidth="0.5" fill="none" />
+        <svg
+          width="400"
+          height="400"
+          viewBox="0 0 400 400"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="200"
+            cy="200"
+            r="200"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="180"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="160"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="140"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="120"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="100"
+            stroke="#FFA500"
+            strokeWidth="0.5"
+            fill="none"
+          />
         </svg>
       </div>
 
@@ -49,26 +141,16 @@ export default function HeroSection() {
             Platform all over the world
           </h1>
           <p className="text-lg text-gray-600 mb-4">
-            The best place to discover & get to the coolest start ups, projects and else.
+            The best place to discover & get to the coolest start ups, projects
+            and else.
             <br />
-            More than 672800 current vacancies from 17750 sites available to you.
+            More than 672800 current vacancies from 17750 sites available to
+            you.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xl mx-auto mt-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <Input
-                type="text"
-                placeholder="Funding title"
-                className="pl-10 py-6 rounded-md w-full"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Button className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white py-6 px-8">
-              Explore Now
-            </Button>
-          </div>
+          <Button className="w-full sm:w-auto bg-purple-500 hover:bg-purple-600 text-white py-6 px-8">
+            Explore Now
+          </Button>
         </motion.div>
 
         <motion.div
@@ -100,5 +182,5 @@ export default function HeroSection() {
         </motion.div> */}
       </div>
     </section>
-  )
+  );
 }

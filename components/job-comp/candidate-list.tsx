@@ -1,59 +1,80 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import CandidateCard from "./candidate-card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import Pagination from "../common-comp/pagination"
-import { Candidate } from "@/types/jobApi"
+import { useState } from "react";
+import CandidateCard from "./candidate-card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import Pagination from "../common-comp/pagination";
+import { Candidate } from "@/types/jobApi";
 
 interface CandidateListProps {
-  candidates: Candidate[]
-  layout: "list" | "grid"
-  onLayoutChange: (layout: "list" | "grid") => void
+  candidates: Candidate[];
+  layout: "list" | "grid";
+  onLayoutChange: (layout: "list" | "grid") => void;
 }
 
-export default function CandidateList({ candidates, layout, onLayoutChange }: CandidateListProps) {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [sortBy, setSortBy] = useState("most-relevant")
-  const candidatesPerPage = 9
+export default function CandidateList({
+  candidates,
+  layout,
+  onLayoutChange,
+}: CandidateListProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState("most-relevant");
+  const candidatesPerPage = 9;
 
   // Sort candidates
   const sortedCandidates = [...candidates].sort((a, b) => {
     switch (sortBy) {
       case "name-asc":
-        return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+        return `${a.firstName} ${a.lastName}`.localeCompare(
+          `${b.firstName} ${b.lastName}`
+        );
       case "name-desc":
-        return `${b.firstName} ${b.lastName}`.localeCompare(`${a.firstName} ${a.lastName}`)
+        return `${b.firstName} ${b.lastName}`.localeCompare(
+          `${a.firstName} ${a.lastName}`
+        );
       case "department":
-        return a.department.localeCompare(b.department)
+        return a.department.localeCompare(b.department);
       case "location":
-        return a.location.localeCompare(b.location)
+        return a.location.localeCompare(b.location);
       default:
-        return 0
+        return 0;
     }
-  })
+  });
 
   // Pagination
-  const indexOfLastCandidate = currentPage * candidatesPerPage
-  const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage
-  const currentCandidates = sortedCandidates.slice(indexOfFirstCandidate, indexOfLastCandidate)
-  const totalPages = Math.ceil(sortedCandidates.length / candidatesPerPage)
+  const indexOfLastCandidate = currentPage * candidatesPerPage;
+  const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
+  const currentCandidates = sortedCandidates.slice(
+    indexOfFirstCandidate,
+    indexOfLastCandidate
+  );
+  const totalPages = Math.ceil(sortedCandidates.length / candidatesPerPage);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h2 className="text-xl font-bold">All Candidates</h2>
-          <p className="text-sm text-gray-500">Showing {sortedCandidates.length} results</p>
+          <p className="text-sm text-gray-500">
+            Showing {sortedCandidates.length} results
+          </p>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-sm text-gray-500 whitespace-nowrap">Sort by:</span>
+            <span className="text-sm text-gray-500 whitespace-nowrap">
+              Sort by:
+            </span>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Sort by" />
@@ -71,7 +92,7 @@ export default function CandidateList({ candidates, layout, onLayoutChange }: Ca
             <Button
               variant="outline"
               size="icon"
-              className={`h-8 w-8 ${layout === "grid" ? "bg-orange-50" : ""}`}
+              className={`h-8 w-8 ${layout === "grid" ? "bg-purple-50" : ""}`}
               onClick={() => onLayoutChange("grid")}
             >
               <svg
@@ -94,7 +115,7 @@ export default function CandidateList({ candidates, layout, onLayoutChange }: Ca
             <Button
               variant="outline"
               size="icon"
-              className={`h-8 w-8 ${layout === "list" ? "bg-orange-50" : ""}`}
+              className={`h-8 w-8 ${layout === "list" ? "bg-purple-50" : ""}`}
               onClick={() => onLayoutChange("list")}
             >
               <svg
@@ -117,7 +138,9 @@ export default function CandidateList({ candidates, layout, onLayoutChange }: Ca
               </svg>
             </Button>
           </div>
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto">Create Project</Button>
+          <Button className="bg-purple-500 hover:bg-purple-600 text-white w-full sm:w-auto">
+            Create Project
+          </Button>
         </div>
       </div>
 
@@ -126,11 +149,18 @@ export default function CandidateList({ candidates, layout, onLayoutChange }: Ca
         <div className="space-y-4">
           {currentCandidates.length > 0 ? (
             currentCandidates.map((candidate, index) => (
-              <CandidateCard key={candidate.id} candidate={candidate} index={index} layout="list" />
+              <CandidateCard
+                key={candidate.id}
+                candidate={candidate}
+                index={index}
+                layout="list"
+              />
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500">No candidates found matching your criteria.</p>
+              <p className="text-gray-500">
+                No candidates found matching your criteria.
+              </p>
             </div>
           )}
         </div>
@@ -138,11 +168,18 @@ export default function CandidateList({ candidates, layout, onLayoutChange }: Ca
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {currentCandidates.length > 0 ? (
             currentCandidates.map((candidate, index) => (
-              <CandidateCard key={candidate.id} candidate={candidate} index={index} layout="grid" />
+              <CandidateCard
+                key={candidate.id}
+                candidate={candidate}
+                index={index}
+                layout="grid"
+              />
             ))
           ) : (
             <div className="text-center py-8 col-span-full">
-              <p className="text-gray-500">No candidates found matching your criteria.</p>
+              <p className="text-gray-500">
+                No candidates found matching your criteria.
+              </p>
             </div>
           )}
         </div>
@@ -150,8 +187,12 @@ export default function CandidateList({ candidates, layout, onLayoutChange }: Ca
 
       {/* Pagination */}
       {sortedCandidates.length > 0 && (
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
-  )
+  );
 }
