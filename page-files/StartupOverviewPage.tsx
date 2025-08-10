@@ -17,6 +17,7 @@ import ProjectList from "@/components/startup-comp/project-list";
 import type { StartupProject } from "@/components/startup-comp/project-card";
 import placeholderimg from "@/public/placeholder.png";
 import { mockProjects } from "@/components/startup-comp/mockProjects";
+import { useGetAllVerifiedStartupsQuery } from "@/redux/api/startupApi";
 
 const categories = [
   { id: "technology", label: "Technology", count: 15 },
@@ -42,6 +43,8 @@ export default function StartupOverviewPage() {
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const { data: allVerifiedStartups } = useGetAllVerifiedStartupsQuery();
+  console.log("data", allVerifiedStartups);
 
   const handleCategoryChange = (id: string, checked: boolean) => {
     if (checked) {

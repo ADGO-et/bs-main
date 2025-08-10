@@ -20,6 +20,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 // import { current } from "@reduxjs/toolkit";
 import TermsModal from "@/components/common-comp/Terms";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
+import {
+  useCreateStartupselfMutation,
+  useCreateStartupByBsTeamMutation,
+} from "@/redux/api/startupApi";
+import { StartupStatus } from "@/types/startupApi";
+import { CldUploadButton } from "next-cloudinary";
 
 export default function StartupCreatePage() {
   const { toast } = useToast();
@@ -36,29 +44,50 @@ export default function StartupCreatePage() {
     firstName: "",
     lastName: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
+    countryOfResidence: "",
     linkedIn: "",
   });
 
   const [companyFormData, setCompanyFormData] = useState({
     companyName: "",
-    companyOverview: "",
-    registeredIn: "",
-    capitalSought: "",
-    budgetForFundraise: "",
-    companyStage: "",
+    description: "",
     fundingGoal: "",
-    campaignDuration: "30",
-    industry: "",
-    currentStateFile: null as File | null,
+    campaignDuration: 30,
+    category: "",
+    videoLink: "",
+    bankName: "",
+    bankAccountHolderName: "",
+    bankAccountNumber: "",
+    swiftCode: "",
   });
 
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [pitchDeckFile, setPitchDeckFile] = useState<File | null>(null);
+  const [projectFormData, setProjectFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    companyName: "",
+    description: "",
+    document: "", // PDF file
+    companyRegistration: "",
+    fundingGoal: "",
+    category: "",
+    bankName: "",
+    bankAccountHolderName: "",
+    bankAccountNumber: "",
+    swiftCode: "",
+    howLong: 30,
+  });
+
   const [teamStep, setTeamStep] = useState<number>(0);
   const [startStep, setStartStep] = useState(0); // 0: email, 1: choose type, 2: flow
   const [startEmail, setStartEmail] = useState("");
-
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [createStartupself, { isLoading: isSelfLoading }] =
+    useCreateStartupselfMutation();
+  const [createStartupByBsTeam, { isLoading: isTeamLoading }] =
+    useCreateStartupByBsTeamMutation();
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserFormData({
@@ -66,7 +95,7 @@ export default function StartupCreatePage() {
       [name]: value,
     });
   };
-
+  const [documentUrl, setDocumentUrl] = useState<string>("");
   const handleCompanyInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -77,9 +106,24 @@ export default function StartupCreatePage() {
     });
   };
 
+  const handleProjectInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setProjectFormData({
+      ...projectFormData,
+      [name]: value,
+    });
+  };
   const handleSelectChange = (name: string, value: string) => {
     setCompanyFormData({
       ...companyFormData,
+      [name]: value,
+    });
+  };
+  const handleProjectSelectChange = (name: string, value: string) => {
+    setProjectFormData({
+      ...projectFormData,
       [name]: value,
     });
   };
@@ -100,44 +144,293 @@ export default function StartupCreatePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission
-    toast({
-      title: "Project submitted!",
-      description: "Your project has been submitted successfully.",
-    });
-    router.push("/dashboard");
+    const creatorId = user?.id;
+    if (creationType === "self") {
+      const payload = {
+        creatorId,
+        firstName: userFormData.firstName,
+        lastName: userFormData.lastName,
+        description: companyFormData.description,
+        phoneNumber: userFormData.phoneNumber,
+        email: userFormData.email,
+        companyName: companyFormData.companyName,
+        bankName: companyFormData.bankName,
+        bankAccountHolderName: companyFormData.bankAccountHolderName,
+        bankAccountNumber: Number(companyFormData.bankAccountNumber),
+        fundingGoal: Number(companyFormData.fundingGoal),
+        swiftCode: companyFormData.swiftCode,
+        countryOfResidence: userFormData.countryOfResidence,
+        linkedIn: userFormData.linkedIn,
+        category: companyFormData.category,
+        campaignDuration: Number(companyFormData.campaignDuration),
+        videoLink: companyFormData.videoLink,
+        status: "pending" as StartupStatus,
+        howLong: Number(companyFormData.campaignDuration),
+      };
+      console.log("payload", payload);
+      try {
+        await createStartupself(payload).unwrap();
+        toast({
+          title: "Project submitted!",
+          description: "Your project has been submitted successfully.",
+        });
+        router.push("/");
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description:
+            error?.data?.message ||
+            "Failed to create startup. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+    if (creationType === "team") {
+      const payload = {
+        creatorId,
+        firstName: projectFormData.firstName,
+        lastName: projectFormData.lastName,
+        description: projectFormData.description,
+        phoneNumber: projectFormData.phoneNumber,
+        email: projectFormData.email,
+        companyName: projectFormData.companyName,
+        bankName: projectFormData.bankName,
+        bankAccountHolderName: projectFormData.bankAccountHolderName,
+        bankAccountNumber: Number(projectFormData.bankAccountNumber),
+        fundingGoal: Number(projectFormData.fundingGoal),
+        swiftCode: projectFormData.swiftCode,
+        companyRegistration: projectFormData.companyRegistration,
+        document: projectFormData.document,
+        category: projectFormData.category,
+        status: "pending" as StartupStatus,
+        howLong: Number(projectFormData.howLong),
+      };
+      try {
+        await createStartupByBsTeam(payload).unwrap();
+        toast({
+          title: "Project submitted!",
+          description: "Your project has been submitted successfully.",
+        });
+        router.push("/");
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description:
+            error?.data?.message ||
+            "Failed to create startup. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
-  // Funding ranges for selection
-  const fundingRanges = [
-    "10,000 - 20,000 ETB",
-    "20,000 - 30,000 ETB",
-    "30,000 - 40,000 ETB",
-    "40,000 - 50,000 ETB",
-    "50,000 - 100,000 ETB",
-    "100,000 - 300,000 ETB",
-    "300,000 - 500,000 ETB",
-    "500,000 - 1,000,000 ETB",
-    "1,000,000+ ETB",
-  ];
-
-  const companies = ["Company A", "Company B", "Company C"];
   // Industry options
-  const industries = [
-    "Technology",
-    "Non Technology"
-  ];
+  const industries = ["Technology", "Non-Technology"];
 
-  const fundraisercost = [
-    "0- 5000ETB",
-    "5,000 - 10,000 ETB",
-    "10,000 - 20,000 ETB",
+  const countries = [
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Antigua and Barbuda",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Barbados",
+    "Belarus",
+    "Belgium",
+    "Belize",
+    "Benin",
+    "Bhutan",
+    "Bolivia",
+    "Bosnia and Herzegovina",
+    "Botswana",
+    "Brazil",
+    "Brunei",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Cabo Verde",
+    "Cambodia",
+    "Cameroon",
+    "Canada",
+    "Central African Republic",
+    "Chad",
+    "Chile",
+    "China",
+    "Colombia",
+    "Comoros",
+    "Congo (Congo-Brazzaville)",
+    "Costa Rica",
+    "Croatia",
+    "Cuba",
+    "Cyprus",
+    "Czechia (Czech Republic)",
+    "Democratic Republic of the Congo",
+    "Denmark",
+    "Djibouti",
+    "Dominica",
+    "Dominican Republic",
+    "Ecuador",
+    "Egypt",
+    "El Salvador",
+    "Equatorial Guinea",
+    "Eritrea",
+    "Estonia",
+    'Eswatini (fmr. "Swaziland")',
+    "Ethiopia",
+    "Fiji",
+    "Finland",
+    "France",
+    "Gabon",
+    "Gambia",
+    "Georgia",
+    "Germany",
+    "Ghana",
+    "Greece",
+    "Grenada",
+    "Guatemala",
+    "Guinea",
+    "Guinea-Bissau",
+    "Guyana",
+    "Haiti",
+    "Holy See",
+    "Honduras",
+    "Hungary",
+    "Iceland",
+    "India",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Ireland",
+    "Israel",
+    "Italy",
+    "Jamaica",
+    "Japan",
+    "Jordan",
+    "Kazakhstan",
+    "Kenya",
+    "Kiribati",
+    "Kuwait",
+    "Kyrgyzstan",
+    "Laos",
+    "Latvia",
+    "Lebanon",
+    "Lesotho",
+    "Liberia",
+    "Libya",
+    "Liechtenstein",
+    "Lithuania",
+    "Luxembourg",
+    "Madagascar",
+    "Malawi",
+    "Malaysia",
+    "Maldives",
+    "Mali",
+    "Malta",
+    "Marshall Islands",
+    "Mauritania",
+    "Mauritius",
+    "Mexico",
+    "Micronesia",
+    "Moldova",
+    "Monaco",
+    "Mongolia",
+    "Montenegro",
+    "Morocco",
+    "Mozambique",
+    "Myanmar (Burma)",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Netherlands",
+    "New Zealand",
+    "Nicaragua",
+    "Niger",
+    "Nigeria",
+    "North Korea",
+    "North Macedonia",
+    "Norway",
+    "Oman",
+    "Pakistan",
+    "Palau",
+    "Palestine State",
+    "Panama",
+    "Papua New Guinea",
+    "Paraguay",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Portugal",
+    "Qatar",
+    "Romania",
+    "Russia",
+    "Rwanda",
+    "Saint Kitts and Nevis",
+    "Saint Lucia",
+    "Saint Vincent and the Grenadines",
+    "Samoa",
+    "San Marino",
+    "Sao Tome and Principe",
+    "Saudi Arabia",
+    "Senegal",
+    "Serbia",
+    "Seychelles",
+    "Sierra Leone",
+    "Singapore",
+    "Slovakia",
+    "Slovenia",
+    "Solomon Islands",
+    "Somalia",
+    "South Africa",
+    "South Korea",
+    "South Sudan",
+    "Spain",
+    "Sri Lanka",
+    "Sudan",
+    "Suriname",
+    "Sweden",
+    "Switzerland",
+    "Syria",
+    "Tajikistan",
+    "Tanzania",
+    "Thailand",
+    "Timor-Leste",
+    "Togo",
+    "Tonga",
+    "Trinidad and Tobago",
+    "Tunisia",
+    "Turkey",
+    "Turkmenistan",
+    "Tuvalu",
+    "Uganda",
+    "Ukraine",
+    "United Arab Emirates",
+    "United Kingdom",
+    "United States of America",
+    "Uruguay",
+    "Uzbekistan",
+    "Vanuatu",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Zambia",
+    "Zimbabwe",
   ];
   if (startStep === 0) {
     // Step 0: Ask for email
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white py-24 px-4">
         <div className="bg-white rounded-2xl shadow-lg p-10 max-w-lg w-full border border-gray-100">
-          <h1 className="text-2xl font-bold mb-6 text-center text-blue-700">Enter Your Email to Begin</h1>
+          <h1 className="text-2xl font-bold mb-6 text-center text-blue-700">
+            Enter Your Email to Begin
+          </h1>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -176,7 +469,9 @@ export default function StartupCreatePage() {
             transition={{ duration: 0.5 }}
             className="text-center mb-16"
           >
-            <h1 className="text-4xl font-extrabold mb-4 text-blue-700">Create Your Project</h1>
+            <h1 className="text-4xl font-extrabold mb-4 text-blue-700">
+              Create Your Project
+            </h1>
             <p className="text-lg text-gray-600">
               Choose how you&apos;d like to proceed with your project creation
             </p>
@@ -205,7 +500,9 @@ export default function StartupCreatePage() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-semibold text-blue-700">Self Direct</h3>
+                  <h3 className="text-2xl font-semibold text-blue-700">
+                    Self Direct
+                  </h3>
                 </div>
                 <p className="text-gray-600 mb-8 text-base">
                   I would like to use BoleStarter to host my fundraise to
@@ -247,7 +544,9 @@ export default function StartupCreatePage() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-semibold text-blue-700">BoleStarter Team</h3>
+                  <h3 className="text-2xl font-semibold text-blue-700">
+                    BoleStarter Team
+                  </h3>
                 </div>
                 <p className="text-gray-600 mb-8 text-base">
                   I&apos;d like the BoleStarter team to create my pitch deck,
@@ -289,7 +588,9 @@ export default function StartupCreatePage() {
               <ArrowLeft className="w-5 h-5 mr-2" /> Back
             </Button>
             <div className="flex-1">
-              <h1 className="text-3xl font-extrabold text-blue-700">Create Your Project</h1>
+              <h1 className="text-3xl font-extrabold text-blue-700">
+                Create Your Project
+              </h1>
               <div className="flex mt-3">
                 <div
                   className={`flex items-center ${
@@ -340,7 +641,9 @@ export default function StartupCreatePage() {
               animate={{ opacity: 1, x: 0 }}
               className="bg-white rounded-2xl shadow-lg p-10 border border-gray-100"
             >
-              <h2 className="text-2xl font-bold mb-8 text-blue-700">User Information</h2>
+              <h2 className="text-2xl font-bold mb-8 text-blue-700">
+                User Information
+              </h2>
               <form className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
@@ -384,29 +687,54 @@ export default function StartupCreatePage() {
                     <Label htmlFor="phone">Phone*</Label>
                     <Input
                       id="phone"
-                      name="phone"
+                      name="phoneNumber"
                       type="tel"
-                      value={userFormData.phone}
+                      value={userFormData.phoneNumber}
                       onChange={handleUserInputChange}
                       required
                       className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
                   </div>
                 </div>
-
-                <div className="space-y-3">
-                  <Label htmlFor="linkedIn">LinkedIn Profile URL</Label>
-                  <Input
-                    id="linkedIn"
-                    name="linkedIn"
-                    type="url"
-                    value={userFormData.linkedIn}
-                    onChange={handleUserInputChange}
-                    placeholder="https://www.linkedin.com/in/your-profile"
-                    className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <Label htmlFor="linkedIn">LinkedIn Profile URL</Label>
+                    <Input
+                      id="linkedIn"
+                      name="linkedIn"
+                      type="url"
+                      value={userFormData.linkedIn}
+                      onChange={handleUserInputChange}
+                      placeholder="https://www.linkedin.com/in/your-profile"
+                      className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <Label htmlFor="countryOfResidence">Country</Label>
+                    <Select
+                      value={userFormData.countryOfResidence}
+                      onValueChange={(value) =>
+                        handleUserInputChange({
+                          target: {
+                            name: "countryOfResidence",
+                            value,
+                          },
+                        } as React.ChangeEvent<HTMLInputElement>)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {country}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-
                 <div className="flex justify-end pt-6">
                   <Button
                     type="button"
@@ -424,7 +752,9 @@ export default function StartupCreatePage() {
               animate={{ opacity: 1, x: 0 }}
               className="bg-white rounded-2xl shadow-lg p-10 border border-gray-100"
             >
-              <h2 className="text-2xl font-bold mb-8 text-blue-700">Company Information</h2>
+              <h2 className="text-2xl font-bold mb-8 text-blue-700">
+                Company Information
+              </h2>
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-3">
                   <Label htmlFor="companyName">Company or Product Name*</Label>
@@ -440,13 +770,13 @@ export default function StartupCreatePage() {
                 </div>
 
                 <div className="space-y-3">
-                  <Label htmlFor="companyOverview">
+                  <Label htmlFor="description">
                     Quick Pitch / Company Overview*
                   </Label>
                   <Textarea
                     id="companyOverview"
-                    name="companyOverview"
-                    value={companyFormData.companyOverview}
+                    name="description"
+                    value={companyFormData.description}
                     onChange={handleCompanyInputChange}
                     placeholder="Example: Solar Charger Power Bank"
                     rows={3}
@@ -457,15 +787,15 @@ export default function StartupCreatePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <Label htmlFor="industry">Category*</Label>
+                    <Label htmlFor="category">Category*</Label>
                     <Select
-                      value={companyFormData.industry}
+                      value={companyFormData.category}
                       onValueChange={(value) =>
-                        handleSelectChange("industry", value)
+                        handleSelectChange("category", value)
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select industry" />
+                        <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
                         {industries.map((industry) => (
@@ -478,23 +808,16 @@ export default function StartupCreatePage() {
                   </div>
                   <div className="space-y-3">
                     <Label htmlFor="fundingGoal">Funding Goal*</Label>
-                    <Select
+                    <Input
+                      id="fundingGoal"
+                      name="fundingGoal"
+                      type="number"
                       value={companyFormData.fundingGoal}
-                      onValueChange={(value) =>
-                        handleSelectChange("fundingGoal", value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select funding range" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fundingRanges.map((range) => (
-                          <SelectItem key={range} value={range}>
-                            {range}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onChange={handleCompanyInputChange}
+                      placeholder="e.g. 1000000"
+                      required
+                      className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
                   </div>
                 </div>
 
@@ -521,58 +844,100 @@ export default function StartupCreatePage() {
                     id="videoLink"
                     name="videoLink"
                     type="url"
+                    value={companyFormData.videoLink}
+                    onChange={handleCompanyInputChange}
                     placeholder="Paste your video link here (YouTube, Vimeo, etc.)"
                     className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-2">Supported: YouTube, Vimeo, Google Drive, etc.</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Supported: YouTube, Vimeo, Google Drive, etc.
+                  </p>
                 </div>
 
                 {/* Banking Information Section */}
                 <div className="space-y-3 pt-4">
-                  <h3 className="text-lg font-semibold text-blue-700 mb-2">Banking Information</h3>
+                  <h3 className="text-lg font-semibold text-blue-700 mb-2">
+                    Banking Information
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-3">
                       <Label htmlFor="bankName">Bank Name*</Label>
                       <Select
                         name="bankName"
                         required
-                        onValueChange={(value) => handleSelectChange("bankName", value)}
+                        onValueChange={(value) =>
+                          handleSelectChange("bankName", value)
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select your bank" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Commercial Bank of Ethiopia">Commercial Bank of Ethiopia</SelectItem>
+                          <SelectItem value="Commercial Bank of Ethiopia">
+                            Commercial Bank of Ethiopia
+                          </SelectItem>
                           <SelectItem value="Awash Bank">Awash Bank</SelectItem>
-                          <SelectItem value="Dashen Bank">Dashen Bank</SelectItem>
-                          <SelectItem value="Abyssinia Bank">Abyssinia Bank</SelectItem>
-                          <SelectItem value="Cooperative Bank of Oromia">Cooperative Bank of Oromia</SelectItem>
-                          <SelectItem value="Nib International Bank">Nib International Bank</SelectItem>
-                          <SelectItem value="United Bank">United Bank</SelectItem>
-                          <SelectItem value="Wegagen Bank">Wegagen Bank</SelectItem>
-                          <SelectItem value="Oromia International Bank">Oromia International Bank</SelectItem>
-                          <SelectItem value="Berhan Bank">Berhan Bank</SelectItem>
-                          <SelectItem value="Lion International Bank">Lion International Bank</SelectItem>
+                          <SelectItem value="Dashen Bank">
+                            Dashen Bank
+                          </SelectItem>
+                          <SelectItem value="Abyssinia Bank">
+                            Abyssinia Bank
+                          </SelectItem>
+                          <SelectItem value="Cooperative Bank of Oromia">
+                            Cooperative Bank of Oromia
+                          </SelectItem>
+                          <SelectItem value="Nib International Bank">
+                            Nib International Bank
+                          </SelectItem>
+                          <SelectItem value="United Bank">
+                            United Bank
+                          </SelectItem>
+                          <SelectItem value="Wegagen Bank">
+                            Wegagen Bank
+                          </SelectItem>
+                          <SelectItem value="Oromia International Bank">
+                            Oromia International Bank
+                          </SelectItem>
+                          <SelectItem value="Berhan Bank">
+                            Berhan Bank
+                          </SelectItem>
+                          <SelectItem value="Lion International Bank">
+                            Lion International Bank
+                          </SelectItem>
                           <SelectItem value="Zemen Bank">Zemen Bank</SelectItem>
                           <SelectItem value="Enat Bank">Enat Bank</SelectItem>
-                          <SelectItem value="Addis International Bank">Addis International Bank</SelectItem>
-                          <SelectItem value="Bunna International Bank">Bunna International Bank</SelectItem>
+                          <SelectItem value="Addis International Bank">
+                            Addis International Bank
+                          </SelectItem>
+                          <SelectItem value="Bunna International Bank">
+                            Bunna International Bank
+                          </SelectItem>
                           <SelectItem value="Abay Bank">Abay Bank</SelectItem>
-                          <SelectItem value="Debub Global Bank">Debub Global Bank</SelectItem>
-                          <SelectItem value="Amhara Bank">Amhara Bank</SelectItem>
+                          <SelectItem value="Debub Global Bank">
+                            Debub Global Bank
+                          </SelectItem>
+                          <SelectItem value="Amhara Bank">
+                            Amhara Bank
+                          </SelectItem>
                           <SelectItem value="Hijra Bank">Hijra Bank</SelectItem>
-                          <SelectItem value="Goh Betoch Bank">Goh Betoch Bank</SelectItem>
+                          <SelectItem value="Goh Betoch Bank">
+                            Goh Betoch Bank
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-3">
-                      <Label htmlFor="accountName">Account Name*</Label>
+                      <Label htmlFor="bankAccountHolderName">
+                        Account Name*
+                      </Label>
                       <Input
-                        id="accountName"
-                        name="accountName"
+                        id="bankAccountHolderName"
+                        name="bankAccountHolderName"
                         type="text"
                         placeholder="e.g. John Doe"
+                        value={companyFormData.bankAccountHolderName}
+                        onChange={handleCompanyInputChange}
                         className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         required
                       />
@@ -580,23 +945,27 @@ export default function StartupCreatePage() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-3">
-                      <Label htmlFor="accountNumber">Account Number*</Label>
+                      <Label htmlFor="bankAccountNumber">Account Number*</Label>
                       <Input
-                        id="accountNumber"
-                        name="accountNumber"
+                        id="bankAccountNumber"
+                        name="bankAccountNumber"
                         type="text"
                         placeholder="e.g. 1234567890"
+                        value={companyFormData.bankAccountNumber}
+                        onChange={handleCompanyInputChange}
                         className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         required
                       />
                     </div>
                     <div className="space-y-3">
-                      <Label htmlFor="iban">IBAN/SWIFT (optional)</Label>
+                      <Label htmlFor="swiftCode">IBAN/SWIFT (optional)</Label>
                       <Input
-                        id="iban"
-                        name="iban"
+                        id="swiftCode"
+                        name="swiftCode"
                         type="text"
                         placeholder="e.g. SWIFT/IBAN code"
+                        value={companyFormData.swiftCode}
+                        onChange={handleCompanyInputChange}
                         className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                       />
                     </div>
@@ -670,7 +1039,9 @@ export default function StartupCreatePage() {
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-2xl shadow-lg p-10 border border-gray-100"
             >
-              <h2 className="text-2xl font-bold mb-8 text-blue-700">Your Information</h2>
+              <h2 className="text-2xl font-bold mb-8 text-blue-700">
+                Your Information
+              </h2>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -680,35 +1051,104 @@ export default function StartupCreatePage() {
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <Label htmlFor="teamFirstName">First Name*</Label>
-                    <Input id="teamFirstName" name="teamFirstName" required className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                    <Label htmlFor="firstName">First Name*</Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      value={projectFormData.firstName}
+                      onChange={handleProjectInputChange}
+                      required
+                      className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
                   </div>
                   <div className="space-y-3">
-                    <Label htmlFor="teamLastName">Last Name*</Label>
-                    <Input id="teamLastName" name="teamLastName" required className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                    <Label htmlFor="lastName">Last Name*</Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      value={projectFormData.lastName}
+                      onChange={handleProjectInputChange}
+                      required
+                      className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
                     <Label htmlFor="teamEmail">Email Address*</Label>
-                    <Input id="teamEmail" name="teamEmail" type="email" required className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={projectFormData.email}
+                      onChange={handleProjectInputChange}
+                      required
+                      className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
                   </div>
                   <div className="space-y-3">
-                    <Label htmlFor="teamPhone">Phone*</Label>
-                    <Input id="teamPhone" name="teamPhone" type="tel" required className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                    <Label htmlFor="phoneNumber">Phone*</Label>
+                    <Input
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      value={projectFormData.phoneNumber}
+                      type="tel"
+                      onChange={handleProjectInputChange}
+                      required
+                      className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
                   </div>
+                </div>
+                <div className="space-y-3">
+                  <Label htmlFor="companyRegistration">Country</Label>
+                  <Select
+                    value={projectFormData.companyRegistration}
+                    onValueChange={(value) =>
+                      handleProjectSelectChange("companyRegistration", value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-3 pt-2">
                   <Label htmlFor="teamCompany">Company Name*</Label>
-                  <Input id="teamCompany" name="teamCompany" required className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                  <Input
+                    id="teamCompany"
+                    name="companyName"
+                    value={projectFormData.companyName}
+                    onChange={handleProjectInputChange}
+                    required
+                    className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
                 </div>
                 <div className="space-y-3 pt-2">
-                  <Label htmlFor="teamDescription">Brief Description of Your Project*</Label>
-                  <Textarea id="teamDescription" name="teamDescription" rows={4} required className="text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                  <Label htmlFor="description">
+                    Brief Description of Your Project*
+                  </Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    value={projectFormData.description}
+                    onChange={handleProjectInputChange}
+                    rows={4}
+                    required
+                    className="text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
                 </div>
                 <div className="space-y-3 pt-2">
-                  <Label htmlFor="currentState" className="text-sm font-medium">Upload Your Document</Label>
-                  <div className="border rounded-md p-4">
+                  <Label htmlFor="currentState" className="text-sm font-medium">
+                    Upload Your Document
+                  </Label>
+                  {/* <div className="border rounded-md p-4">
                     <div className="flex items-center justify-center w-full">
                       <label
                         htmlFor="currentState"
@@ -717,84 +1157,128 @@ export default function StartupCreatePage() {
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <Upload className="w-8 h-8 mb-2 text-gray-500" />
                           <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">Click to upload</span> or drag and drop
+                            <span className="font-semibold">
+                              Click to upload
+                            </span>{" "}
+                            or drag and drop
                           </p>
-                          <p className="text-xs text-gray-500">PDF files only (MAX. 5MB)</p>
+                          <p className="text-xs text-gray-500">
+                            PDF files only (MAX. 5MB)
+                          </p>
                         </div>
                         <input
                           id="currentState"
                           type="file"
                           className="hidden"
                           accept=".pdf"
-                          onChange={(e) => handleFileChange(e, setCurrentStateFile)}
+                          onChange={(e) =>
+                            handleFileChange(e, setCurrentStateFile)
+                          }
                         />
                       </label>
+                    </div>
+                  </div> */}
+                  <div>
+                    <div>
+                      <CldUploadButton
+                        uploadPreset="ml_default"
+                        onSuccess={(result: any) => {
+                          // console.log("Upload result:", result);
+                          if (result?.info?.secure_url) {
+                            setProjectFormData((prev) => ({
+                              ...prev,
+                              document: result.info.secure_url,
+                            }));
+                            setDocumentUrl(result.info.secure_url);
+                            toast({
+                              title: "Success",
+                              description: "Document uploaded successfully!",
+                              variant: "default",
+                            });
+                          }
+                        }}
+                        onError={(error: any) => {
+                          console.error("Upload error:", error);
+                          toast({
+                            title: "Upload failed",
+                            description:
+                              "Failed to upload document. Please try again.",
+                            variant: "destructive",
+                          });
+                        }}
+                        className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100"
+                      >
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                          <p className="mb-2 text-sm text-gray-500">
+                            <span className="font-semibold">
+                              Click to upload
+                            </span>{" "}
+                            or drag and drop
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            PDF files only (MAX. 5MB)
+                          </p>
+                        </div>
+                      </CldUploadButton>
+                      {projectFormData.document && (
+                        <p className="text-green-600 text-sm mt-2">
+                          Document uploaded successfully!
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
                   <div className="space-y-3">
-                    <Label htmlFor="registeredIn">My company is registered in:</Label>
-                    <Select
-                      value={companyFormData.registeredIn}
-                      onValueChange={(value) => handleSelectChange("registeredIn", value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {companies.map((range) => (
-                          <SelectItem key={range} value={range}>{range}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="fundingGoal">
+                      How much capital are you seeking in the raise*
+                    </Label>
+                    <Input
+                      id="fundingGoal"
+                      name="fundingGoal"
+                      type="number"
+                      value={projectFormData.fundingGoal}
+                      onChange={handleProjectInputChange}
+                      placeholder="e.g. 1000000"
+                      required
+                      className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
                   </div>
                   <div className="space-y-3">
-                    <Label htmlFor="capitalSought">How much capital are you seeking in the raise*</Label>
-                    <Select
-                      value={companyFormData.capitalSought}
-                      onValueChange={(value) => handleSelectChange("capitalSought", value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select capital" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fundingRanges.map((range) => (
-                          <SelectItem key={range} value={range}>{range}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="campaignDuration">
+                      Campaign Duration (max 90 days)*
+                    </Label>
+                    <Input
+                      id="howLong"
+                      name="howLong"
+                      type="number"
+                      min="1"
+                      max="90"
+                      value={projectFormData.howLong}
+                      onChange={handleProjectInputChange}
+                      required
+                      className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
                   <div className="space-y-3">
-                    <Label htmlFor="budgetForFundraise">How much have you budgeted for costs related to your fundraise?*</Label>
+                    <Label htmlFor="category">Category:*</Label>
                     <Select
-                      value={companyFormData.budgetForFundraise}
-                      onValueChange={(value) => handleSelectChange("budgetForFundraise", value)}
+                      value={projectFormData.category}
+                      onValueChange={(value) =>
+                        handleProjectSelectChange("category", value)
+                      }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select funding range" />
+                        <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {fundraisercost.map((range) => (
-                          <SelectItem key={range} value={range}>{range}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-3">
-                    <Label htmlFor="companyStage">My Company is:*</Label>
-                    <Select
-                      value={companyFormData.companyStage}
-                      onValueChange={(value) => handleSelectChange("companyStage", value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select funding range" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {industries.map((range) => (
-                          <SelectItem key={range} value={range}>{range}</SelectItem>
+                        {industries.map((industry) => (
+                          <SelectItem key={industry} value={industry}>
+                            {industry}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -803,49 +1287,87 @@ export default function StartupCreatePage() {
 
                 {/* Banking Information Section */}
                 <div className="space-y-3 pt-4">
-                  <h3 className="text-lg font-semibold text-blue-700 mb-2">Banking Information</h3>
+                  <h3 className="text-lg font-semibold text-blue-700 mb-2">
+                    Banking Information
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-3">
                       <Label htmlFor="bankName">Bank Name*</Label>
                       <Select
                         name="bankName"
                         required
-                        onValueChange={(value) => handleSelectChange("bankName", value)}
+                        onValueChange={(value) =>
+                          handleProjectSelectChange("bankName", value)
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select your bank" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Commercial Bank of Ethiopia">Commercial Bank of Ethiopia</SelectItem>
+                          <SelectItem value="Commercial Bank of Ethiopia">
+                            Commercial Bank of Ethiopia
+                          </SelectItem>
                           <SelectItem value="Awash Bank">Awash Bank</SelectItem>
-                          <SelectItem value="Dashen Bank">Dashen Bank</SelectItem>
-                          <SelectItem value="Abyssinia Bank">Abyssinia Bank</SelectItem>
-                          <SelectItem value="Cooperative Bank of Oromia">Cooperative Bank of Oromia</SelectItem>
-                          <SelectItem value="Nib International Bank">Nib International Bank</SelectItem>
-                          <SelectItem value="United Bank">United Bank</SelectItem>
-                          <SelectItem value="Wegagen Bank">Wegagen Bank</SelectItem>
-                          <SelectItem value="Oromia International Bank">Oromia International Bank</SelectItem>
-                          <SelectItem value="Berhan Bank">Berhan Bank</SelectItem>
-                          <SelectItem value="Lion International Bank">Lion International Bank</SelectItem>
+                          <SelectItem value="Dashen Bank">
+                            Dashen Bank
+                          </SelectItem>
+                          <SelectItem value="Abyssinia Bank">
+                            Abyssinia Bank
+                          </SelectItem>
+                          <SelectItem value="Cooperative Bank of Oromia">
+                            Cooperative Bank of Oromia
+                          </SelectItem>
+                          <SelectItem value="Nib International Bank">
+                            Nib International Bank
+                          </SelectItem>
+                          <SelectItem value="United Bank">
+                            United Bank
+                          </SelectItem>
+                          <SelectItem value="Wegagen Bank">
+                            Wegagen Bank
+                          </SelectItem>
+                          <SelectItem value="Oromia International Bank">
+                            Oromia International Bank
+                          </SelectItem>
+                          <SelectItem value="Berhan Bank">
+                            Berhan Bank
+                          </SelectItem>
+                          <SelectItem value="Lion International Bank">
+                            Lion International Bank
+                          </SelectItem>
                           <SelectItem value="Zemen Bank">Zemen Bank</SelectItem>
                           <SelectItem value="Enat Bank">Enat Bank</SelectItem>
-                          <SelectItem value="Addis International Bank">Addis International Bank</SelectItem>
-                          <SelectItem value="Bunna International Bank">Bunna International Bank</SelectItem>
+                          <SelectItem value="Addis International Bank">
+                            Addis International Bank
+                          </SelectItem>
+                          <SelectItem value="Bunna International Bank">
+                            Bunna International Bank
+                          </SelectItem>
                           <SelectItem value="Abay Bank">Abay Bank</SelectItem>
-                          <SelectItem value="Debub Global Bank">Debub Global Bank</SelectItem>
-                          <SelectItem value="Amhara Bank">Amhara Bank</SelectItem>
+                          <SelectItem value="Debub Global Bank">
+                            Debub Global Bank
+                          </SelectItem>
+                          <SelectItem value="Amhara Bank">
+                            Amhara Bank
+                          </SelectItem>
                           <SelectItem value="Hijra Bank">Hijra Bank</SelectItem>
-                          <SelectItem value="Goh Betoch Bank">Goh Betoch Bank</SelectItem>
+                          <SelectItem value="Goh Betoch Bank">
+                            Goh Betoch Bank
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-3">
-                      <Label htmlFor="accountName">Account Name*</Label>
+                      <Label htmlFor="bankAccountHolderName">
+                        Account Name*
+                      </Label>
                       <Input
-                        id="accountName"
-                        name="accountName"
+                        id="bankAccountHolderName"
+                        name="bankAccountHolderName"
                         type="text"
                         placeholder="e.g. John Doe"
+                        value={projectFormData.bankAccountHolderName}
+                        onChange={handleProjectInputChange}
                         className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         required
                       />
@@ -853,22 +1375,26 @@ export default function StartupCreatePage() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-3">
-                      <Label htmlFor="accountNumber">Account Number*</Label>
+                      <Label htmlFor="bankAccountNumber">Account Number*</Label>
                       <Input
-                        id="accountNumber"
-                        name="accountNumber"
+                        id="bankAccountNumber"
+                        name="bankAccountNumber"
                         type="text"
+                        value={projectFormData.bankAccountNumber}
+                        onChange={handleProjectInputChange}
                         placeholder="e.g. 1234567890"
                         className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         required
                       />
                     </div>
                     <div className="space-y-3">
-                      <Label htmlFor="iban">IBAN/SWIFT (optional)</Label>
+                      <Label htmlFor="swiftCode">IBAN/SWIFT (optional)</Label>
                       <Input
-                        id="iban"
-                        name="iban"
+                        id="swiftCode"
+                        name="swiftCode"
                         type="text"
+                        value={projectFormData.swiftCode}
+                        onChange={handleProjectInputChange}
                         placeholder="e.g. SWIFT/IBAN code"
                         className="h-11 text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                       />
@@ -962,8 +1488,8 @@ export default function StartupCreatePage() {
                       {expandedSection === "step2" && (
                         <div className="p-4 bg-blue-50">
                           <p className="text-sm text-gray-600">
-                            Take your slides and documents - we&apos;ll craft them
-                            into beautiful, persuasive pitch decks that win
+                            Take your slides and documents - we&apos;ll craft
+                            them into beautiful, persuasive pitch decks that win
                             funding.
                           </p>
                         </div>
@@ -1028,11 +1554,20 @@ export default function StartupCreatePage() {
                   </div>
                 </div>
               </div>
-              <div className="flex justify-end pt-6">
+              <div className="flex justify-between pt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setTeamStep(0)}
+                  className="py-2 text-md rounded-lg"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                </Button>
                 <Button
                   type="button"
                   className="bg-blue-600 hover:bg-blue-700"
                   onClick={handleSubmit}
+                  disabled={!projectFormData.document}
                 >
                   Submit Request
                 </Button>

@@ -1,14 +1,20 @@
 import { creatingStartupPayload, StartupApproval } from "@/types/startupApi";
+import { creatingStartupWithBsTeamPayload } from "@/types/startupApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const startupApi = createApi({
   reducerPath: "startupApi",
   baseQuery: fetchBaseQuery({
-    // baseUrl: "https://bole.weytech.et:5002", // production
-    baseUrl: "http://localhost:5002", // local development
+    baseUrl: "https://bole.weytech.et:5002", // production
+    // baseUrl: "http://localhost:5002", // local development
     // credentials: "include",
-    prepareHeaders: (headers) => {
-      headers.set("Content-Type", `application/json`);
+    prepareHeaders: (headers, { getState }) => {
+      headers.set("Content-Type", "application/json");
+      // Get token from Redux state
+      const token = (getState() as any).auth.accessToken;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
       return headers;
     },
   }),
@@ -16,14 +22,24 @@ export const startupApi = createApi({
   tagTypes: [],
   endpoints: (builder) => ({
     // create a new startup
-    createStartup: builder.mutation<any, creatingStartupPayload>({
+    createStartupself: builder.mutation<any, creatingStartupPayload>({
       query: (startup) => ({
-        url: "/startup",
+        url: "/startup/self",
         method: "POST",
         body: startup,
       }),
     }),
 
+    createStartupByBsTeam: builder.mutation<
+      any,
+      creatingStartupWithBsTeamPayload
+    >({
+      query: (startup) => ({
+        url: "/startup/bole",
+        method: "POST",
+        body: startup,
+      }),
+    }),
     // get all startups (this is for the admin only)
     getAllStartups: builder.query<any, void>({
       query: () => ({
@@ -99,7 +115,8 @@ export const startupApi = createApi({
 });
 
 export const {
-  useCreateStartupMutation,
+  useCreateStartupselfMutation,
+  useCreateStartupByBsTeamMutation,
   useGetAllStartupsQuery,
   useGetAllVerifiedStartupsQuery,
   useGetAllUnverifiedStartupsQuery,
