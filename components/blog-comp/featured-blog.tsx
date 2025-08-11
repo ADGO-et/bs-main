@@ -18,6 +18,7 @@ interface FeaturedBlogProps {
 export default function FeaturedBlog({
   id,
   title,
+  image,
   secondaryHeading,
   description,
 }: FeaturedBlogProps) {
@@ -29,7 +30,13 @@ export default function FeaturedBlog({
       className="relative rounded-xl overflow-hidden mb-12"
     >
       <div className="relative h-[400px] w-full">
-        <Image src={imgg} alt={title} fill className="object-cover" />
+        {image ? (
+          // Use blog image if provided
+          <Image src={image} alt={title} fill className="object-cover" />
+        ) : (
+          // Fallback to default image
+          <Image src={imgg} alt={title} fill className="object-cover" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
           <h1 className="text-3xl font-bold mb-2">{title}</h1>

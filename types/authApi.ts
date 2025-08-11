@@ -39,3 +39,17 @@ export interface AuthState {
   accessToken: string | null;
   isAuthenticated: boolean;
 }
+
+export interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+  tokenVersion: number;
+  likedStartups: string[];
+  createdAt: string;
+  updatedAt: string;
+}

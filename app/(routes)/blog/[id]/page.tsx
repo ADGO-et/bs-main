@@ -2,7 +2,7 @@
 // @ts-nocheck
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, User, ArrowLeft, Share2, ThumbsUp } from "lucide-react";
@@ -10,104 +10,61 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import BlogCard from "@/components/blog-comp/BlogCard";
 import { useParams } from "next/navigation";
-
-// Mock blog data
-const mockBlogs = Array.from({ length: 30 }, (_, i) => ({
-  id: `blog-${i + 1}`,
-  title:
-    i === 0
-      ? "Integer Maecenas Eget Viverra"
-      : [
-          "Integer Maecenas Eget Viverra",
-          "Aenean eleifend ante maecenas",
-          "Vivamus laoreet mauris fusce",
-        ][i % 3],
-  secondaryHeading: "The Future of Digital Marketing",
-  description:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-  content: `
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    <h2>Key Points</h2>
-    <ul>
-      <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit</li>
-      <li>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</li>
-      <li>Ut enim ad minim veniam, quis nostrud exercitation ullamco</li>
-    </ul>
-    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-  `,
-  image: [
-    "https://images.pexels.com/photos/13167951/pexels-photo-13167951.jpeg?cs=srgb&dl=pexels-ezgi-bulut-280715511-13167951.jpg&fm=jpg",
-    "https://images.pexels.com/photos/13167951/pexels-photo-13167951.jpeg?cs=srgb&dl=pexels-ezgi-bulut-280715511-13167951.jpg&fm=jpg",
-    "https://images.pexels.com/photos/13167951/pexels-photo-13167951.jpeg?cs=srgb&dl=pexels-ezgi-bulut-280715511-13167951.jpg&fm=jpg",
-  ][i % 3],
-  videoLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  referenceLink: "https://example.com/reference",
-  author: ["John Doe", "Jane Smith", "Alex Johnson"][i % 3],
-  date: new Date(2023, i % 12, (i % 28) + 1).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }),
-}));
+import { useGetBlogByIdQuery, useGetAllBlogsQuery } from "@/redux/api/blogApi";
 
 export default function BlogDetailPage() {
   const params = useParams();
   const id = params.id as string;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [blog, setBlog] = useState<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
+  // Fetch blog by ID
+  const { data, isLoading, isError } = useGetBlogByIdQuery(id);
+  const blog = data?.data;
+
+  // Fetch all blogs for related articles
+  const { data: allBlogsData } = useGetAllBlogsQuery();
+  const allBlogs = allBlogsData?.data?.blogs || [];
+
+  // Related blogs: exclude current, pick 3 random
+  const relatedBlogs = allBlogs
+    .filter((b) => b._id !== id)
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 3);
+
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(15);
+  const [likeCount, setLikeCount] = useState(blog?.likes?.length ?? 0);
 
   useEffect(() => {
-    // Find the blog with the matching ID
-    const foundBlog = mockBlogs.find((blog) => blog.id === id);
-
-    if (foundBlog) {
-      setBlog(foundBlog);
-
-      // Get 3 related blogs (excluding the current one)
-      const related = mockBlogs
-        .filter((b) => b.id !== id)
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 3);
-
-      setRelatedBlogs(related);
-    }
-  }, [id]);
+    setLikeCount(blog?.likes?.length ?? 0);
+  }, [blog]);
 
   const handleLike = () => {
     if (liked) {
-      setLikeCount(likeCount - 1);
+      setLikeCount((prev) => prev - 1);
     } else {
-      setLikeCount(likeCount + 1);
+      setLikeCount((prev) => prev + 1);
     }
     setLiked(!liked);
+    // Optionally, call likeBlog mutation here
   };
 
-  if (!blog) {
+  if (isLoading)
     return (
       <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
         <p>Loading...</p>
       </div>
     );
-  }
+  if (isError || !blog)
+    return (
+      <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
+        <p>Blog not found.</p>
+      </div>
+    );
 
   return (
-    <div className="min-h-screen pt-44 pb-16 relative overflow-hidden">
+    <div className="min-h-screen  pb-16 relative overflow-hidden">
       {/* Background patterns */}
       <div className="absolute -left-40 top-0 opacity-10">
-        <svg
-          width="400"
-          height="400"
-          viewBox="0 0 400 400"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg width="400" height="400" viewBox="0 0 400 400" fill="none">
           <circle
             cx="200"
             cy="200"
@@ -134,15 +91,8 @@ export default function BlogDetailPage() {
           />
         </svg>
       </div>
-
       <div className="absolute -right-40 bottom-0 opacity-10">
-        <svg
-          width="400"
-          height="400"
-          viewBox="0 0 400 400"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg width="400" height="400" viewBox="0 0 400 400" fill="none">
           <circle
             cx="200"
             cy="200"
@@ -190,7 +140,7 @@ export default function BlogDetailPage() {
           {/* Blog Header */}
           <div className="relative h-[400px] w-full">
             <Image
-              src={blog.image || "/placeholder.svg"}
+              src={blog.blogImage || "/placeholder.svg"}
               alt={blog.title}
               fill
               className="object-cover"
@@ -201,11 +151,23 @@ export default function BlogDetailPage() {
             <div className="flex items-center text-sm text-gray-500 space-x-4 mb-4">
               <div className="flex items-center">
                 <User size={16} className="mr-1" />
-                <span>{blog.author}</span>
+                <span>
+                  {blog.authorId?.firstName && blog.authorId?.lastName
+                    ? `${blog.authorId.firstName} ${blog.authorId.lastName}`
+                    : blog.authorId?.username ||
+                      blog.authorId?.email ||
+                      "Unknown"}
+                </span>
               </div>
               <div className="flex items-center">
                 <Calendar size={16} className="mr-1" />
-                <span>{blog.date}</span>
+                <span>
+                  {new Date(blog.createdAt).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
             </div>
 
@@ -214,10 +176,13 @@ export default function BlogDetailPage() {
               {blog.secondaryHeading}
             </h2>
 
-            <div
-              className="prose max-w-none mb-8"
-              dangerouslySetInnerHTML={{ __html: blog.content }}
-            />
+            <div className="prose max-w-none mb-8">
+              {Array.isArray(blog.content) ? (
+                blog.content.map((para, idx) => <p key={idx}>{para}</p>)
+              ) : (
+                <p>{blog.content}</p>
+              )}
+            </div>
 
             {/* Video Embed */}
             {blog.videoLink && (
@@ -278,16 +243,30 @@ export default function BlogDetailPage() {
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Related Articles</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {relatedBlogs.map((blog, index) => (
+            {relatedBlogs.map((related, index) => (
               <BlogCard
-                key={blog.id}
-                id={blog.id}
-                title={blog.title}
-                secondaryHeading={blog.secondaryHeading}
-                description={blog.description}
-                image={blog.image}
-                author={blog.author}
-                date={blog.date}
+                key={related._id}
+                id={related._id}
+                title={related.title}
+                secondaryHeading={related.secondaryHeading}
+                description={
+                  Array.isArray(related.content)
+                    ? related.content[0]
+                    : related.content
+                }
+                image={related.blogImage}
+                author={
+                  related.authorId?.firstName && related.authorId?.lastName
+                    ? `${related.authorId.firstName} ${related.authorId.lastName}`
+                    : related.authorId?.username ||
+                      related.authorId?.email ||
+                      "Unknown"
+                }
+                date={new Date(related.createdAt).toLocaleDateString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
                 delay={index}
               />
             ))}
