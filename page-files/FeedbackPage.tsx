@@ -7,15 +7,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { useSubmitFeedbackMutation } from "@/redux/api/feedbackApi";
 
 export default function FeedbackPage() {
   const [name, setName] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
   const [experience, setExperience] = useState("");
-  const [rating, setRating] = useState(5); // 1-5 rating scale
+  const [rating, setRating] = useState(5);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  const [submitFeedback] = useSubmitFeedbackMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,20 +32,32 @@ export default function FeedbackPage() {
     }
 
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await submitFeedback({
+        fullName: name,
+        email,
+        contactNumber,
+        rating,
+        description: experience,
+      }).unwrap();
       toast({
         title: "Feedback submitted!",
         description: "Thank you for your feedback.",
       });
-      // Reset form
       setName("");
       setContactNumber("");
       setEmail("");
       setExperience("");
       setRating(5);
+    } catch (error: any) {
+      toast({
+        title: "Submission failed",
+        description: error?.data?.message || "Could not submit feedback.",
+        variant: "destructive",
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const ratingEmojis = [
