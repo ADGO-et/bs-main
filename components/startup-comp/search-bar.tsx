@@ -27,7 +27,8 @@ export default function SearchBar({
   onSearchChange,
   onLocationChange,
   onSearch,
-}: SearchBarProps) {
+}: // onSearch,
+SearchBarProps) {
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <div className="relative flex-grow">

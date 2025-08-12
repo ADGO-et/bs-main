@@ -166,7 +166,7 @@ export default function ProjectList({
           {currentProjects.length > 0 ? (
             currentProjects.map((project, index) => (
               <ProjectCard
-                key={project.id}
+                key={project._id}
                 project={project}
                 index={index}
                 layout="list"
@@ -185,7 +185,7 @@ export default function ProjectList({
           {currentProjects.length > 0 ? (
             currentProjects.map((project, index) => (
               <ProjectCard
-                key={project.id}
+                key={project._id}
                 project={project}
                 index={index}
                 layout="grid"

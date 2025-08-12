@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,14 +11,34 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { motion } from "framer-motion";
-import SearchBar from "@/components/startup-comp/search-bar";
-import ProjectFilters from "@/components/startup-comp/project-filters";
-import ProjectList from "@/components/startup-comp/project-list";
-import type { StartupProject } from "@/components/startup-comp/project-card";
-import placeholderimg from "@/public/placeholder.png";
-import { mockProjects } from "@/components/startup-comp/mockProjects";
 import { useGetAllVerifiedStartupsQuery } from "@/redux/api/startupApi";
+import type { StartupProject } from "@/components/startup-comp/project-card";
+
+// Dynamically imported components
+const MotionDiv = dynamic(
+  () => import("framer-motion").then((mod) => mod.motion.div),
+  { ssr: false }
+);
+
+const ProjectFilters = dynamic(
+  () => import("@/components/startup-comp/project-filters"),
+  { ssr: false }
+);
+
+const ProjectList = dynamic(
+  () => import("@/components/startup-comp/project-list"),
+  { ssr: false }
+);
+
+const SearchBar = dynamic(
+  () => import("@/components/startup-comp/search-bar"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-10 w-full bg-gray-100 rounded-md animate-pulse" />
+    ),
+  }
+);
 
 const categories = [
   { id: "technology", label: "Technology", count: 15 },
@@ -36,15 +57,59 @@ export default function StartupOverviewPage() {
   // State
   const [searchTerm, setSearchTerm] = useState("");
   const [location, setLocation] = useState("all");
-  const [projects, _] = useState<StartupProject[]>(mockProjects);
-  const [filteredProjects, setFilteredProjects] =
-    useState<StartupProject[]>(mockProjects);
+  const [filteredProjects, setFilteredProjects] = useState<StartupProject[]>(
+    []
+  );
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [layout, setLayout] = useState<"list" | "grid">("list");
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-  const { data: allVerifiedStartups } = useGetAllVerifiedStartupsQuery();
-  console.log("data", allVerifiedStartups);
+  // Redux query with reduced re-fetching
+  const { data: allVerifiedStartups } = useGetAllVerifiedStartupsQuery(
+    undefined,
+    {
+      refetchOnMountOrArgChange: false,
+      refetchOnFocus: false,
+    }
+  );
+
+  // Filter projects with debounce effect
+  useEffect(() => {
+    if (!allVerifiedStartups?.data?.startups) return;
+
+    const filterProjects = () => {
+      let results = [...allVerifiedStartups.data.startups];
+
+      // Apply search term filter
+      if (searchTerm) {
+        const searchTermLower = searchTerm.toLowerCase();
+        results = results.filter(
+          (project) =>
+            project.projectName?.toLowerCase().includes(searchTermLower) ||
+            project.projectDescription?.toLowerCase().includes(searchTermLower)
+        );
+      }
+
+      // Apply category filter
+      if (selectedCategories.length > 0) {
+        results = results.filter((project) => {
+          const category = project.category?.toLowerCase() || "";
+          return selectedCategories.some((cat) => cat === category);
+        });
+      }
+
+      // Apply location filter
+      if (location && location !== "all") {
+        results = results.filter(
+          (project) => project.location?.toLowerCase() === location
+        );
+      }
+
+      setFilteredProjects(results);
+    };
+
+    const timer = setTimeout(filterProjects, 300);
+    return () => clearTimeout(timer);
+  }, [allVerifiedStartups, searchTerm, selectedCategories, location]);
 
   const handleCategoryChange = (id: string, checked: boolean) => {
     if (checked) {
@@ -56,43 +121,14 @@ export default function StartupOverviewPage() {
     }
   };
 
-  // Apply filters
-  const applyFilters = () => {
-    let results = [...projects];
-
-    // Apply search term filter
-    if (searchTerm) {
-      const searchTermLower = searchTerm.toLowerCase();
-      results = results.filter(
-        (project) =>
-          project.projectName.toLowerCase().includes(searchTermLower) ||
-          project.projectDescription.toLowerCase().includes(searchTermLower)
-      );
-    }
-
-    // Apply category filter
-    if (selectedCategories.length > 0) {
-      results = results.filter((project) => {
-        const category = project.category?.toLowerCase() || "";
-        return selectedCategories.some((cat) => cat === category);
-      });
-    }
-
-    setFilteredProjects(results);
-  };
-
-  // Clear all filters
   const clearFilters = () => {
     setSearchTerm("");
     setLocation("all");
     setSelectedCategories([]);
-    setFilteredProjects(projects);
+    if (allVerifiedStartups?.data?.startups) {
+      setFilteredProjects([...allVerifiedStartups.data.startups]);
+    }
   };
-
-  // Apply filters when any filter state changes
-  useEffect(() => {
-    applyFilters();
-  }, [searchTerm, location]);
 
   return (
     <div className="min-h-screen pt-0 pb-16 relative overflow-hidden">
@@ -168,7 +204,7 @@ export default function StartupOverviewPage() {
       </div>
 
       <div className="container mx-auto px-4">
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -182,10 +218,10 @@ export default function StartupOverviewPage() {
             Find and support promising startup projects across various
             industries
           </p>
-        </motion.div>
+        </MotionDiv>
 
         {/* Search Bar */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -197,9 +233,8 @@ export default function StartupOverviewPage() {
             locations={locations}
             onSearchChange={setSearchTerm}
             onLocationChange={setLocation}
-            onSearch={applyFilters}
           />
-        </motion.div>
+        </MotionDiv>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Mobile Filter Button */}
@@ -226,7 +261,6 @@ export default function StartupOverviewPage() {
                     categories={categories}
                     selectedCategories={selectedCategories}
                     onCategoryChange={handleCategoryChange}
-                    onApplyFilters={applyFilters}
                     onClearFilters={clearFilters}
                   />
                 </div>
@@ -234,8 +268,8 @@ export default function StartupOverviewPage() {
             </Sheet>
           </div>
 
-          {/* Desktop Filters - Hidden on Mobile */}
-          <motion.div
+          {/* Desktop Filters */}
+          <MotionDiv
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -245,13 +279,12 @@ export default function StartupOverviewPage() {
               categories={categories}
               selectedCategories={selectedCategories}
               onCategoryChange={handleCategoryChange}
-              onApplyFilters={applyFilters}
               onClearFilters={clearFilters}
             />
-          </motion.div>
+          </MotionDiv>
 
           {/* Projects List */}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -262,7 +295,7 @@ export default function StartupOverviewPage() {
               layout={layout}
               onLayoutChange={setLayout}
             />
-          </motion.div>
+          </MotionDiv>
         </div>
       </div>
     </div>

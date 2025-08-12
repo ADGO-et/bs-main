@@ -1,4 +1,10 @@
-import { creatingStartupPayload, StartupApproval } from "@/types/startupApi";
+import {
+  creatingStartupPayload,
+  StartupApproval,
+  StartupCommentResponse,
+  StartupCommentsListResponse,
+  StartupLikeResponse,
+} from "@/types/startupApi";
 import { creatingStartupWithBsTeamPayload } from "@/types/startupApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
@@ -111,6 +117,26 @@ export const startupApi = createApi({
         method: "DELETE",
       }),
     }),
+
+    getStartupComments: builder.query<StartupCommentsListResponse, string>({
+      query: (startupId) => `/startup/comments/${startupId}`,
+    }),
+    postStartupComment: builder.mutation<
+      StartupCommentResponse,
+      { startupId: string; content: string }
+    >({
+      query: ({ startupId, content }) => ({
+        url: `/startup/comments/${startupId}`,
+        method: "POST",
+        body: { content },
+      }),
+    }),
+    likeOrDislikeStartup: builder.mutation<StartupLikeResponse, string>({
+      query: (id) => ({
+        url: `/startup/${id}/like`,
+        method: "PATCH",
+      }),
+    }),
   }),
 });
 
@@ -125,4 +151,7 @@ export const {
   useUpdateStartupApprovalMutation,
   useUpdateStartupMutation,
   useDeleteStartupMutation,
+  useGetStartupCommentsQuery,
+  usePostStartupCommentMutation,
+  useLikeOrDislikeStartupMutation,
 } = startupApi;
