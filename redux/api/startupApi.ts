@@ -11,7 +11,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const startupApi = createApi({
   reducerPath: "startupApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et:5002", // production
+    baseUrl: "https://bole.weytech.et/api", // production
     // baseUrl: "http://localhost:5002", // local development
     // credentials: "include",
     prepareHeaders: (headers, { getState }) => {

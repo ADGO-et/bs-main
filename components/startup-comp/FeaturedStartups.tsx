@@ -23,10 +23,11 @@ export default function FeaturedStartups() {
   // Fetch verified startups from API
   const { data, isLoading, isError } = useGetAllVerifiedStartupsQuery();
   const projects = data?.data?.startups || [];
+  console.log("PR", projects);
 
   // Example filtering for sections
-  const featured = projects[0];
-  const additionalProjects = projects.slice(1, 5);
+
+  // const additionalProjects = projects.slice(1, 5);
   const recommendations = projects.slice(5);
   const totalPages = Math.ceil(
     recommendations.length / RECOMMENDATIONS_PER_PAGE
@@ -36,12 +37,15 @@ export default function FeaturedStartups() {
     page * RECOMMENDATIONS_PER_PAGE
   );
 
-  // Example: Non-Technological projects (filter by category)
   const nonTechProjects = projects
     .filter((project) => project.category?.toLowerCase() === "non-technology")
     .slice(0, 4);
 
-  // Example: Editor's Choice (first two projects)
+  const techProjects = projects.filter(
+    (project) => project.category?.toLowerCase() === "technology"
+  );
+  const featured = techProjects[0];
+  // (first two projects)
   const editorsChoice = projects.slice(0, 2);
 
   const ProjectCard = ({ project, variant = "default", size = "medium" }) => {
@@ -232,7 +236,7 @@ export default function FeaturedStartups() {
             </div>
 
             <div className="w-full md:w-full lg:w-[60%] grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-6 h-auto">
-              {additionalProjects.map((project) => (
+              {techProjects.slice(1).map((project) => (
                 <ProjectCard
                   key={project._id}
                   project={project}
