@@ -30,6 +30,7 @@ export interface Startup {
   updatedAt: string;
   __v?: number;
   postExpiryDate: string;
+  image: string;
 }
 
 export interface creatingStartupPayload {

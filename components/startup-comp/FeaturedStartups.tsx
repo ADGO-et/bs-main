@@ -12,10 +12,22 @@ import {
   ChevronRight,
   TrendingUp,
   Star,
+  Folder,
 } from "lucide-react";
 
 const RECOMMENDATIONS_PER_PAGE = 6;
 
+function NoProjectsPlaceholder({ text }: { text: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+      <Folder className="w-16 h-16 mb-4" />
+      <h3 className="text-xl font-semibold mb-2">{text}</h3>
+      <p className="text-base">
+        There are currently no startups to display. Please check back later!
+      </p>
+    </div>
+  );
+}
 export default function FeaturedStartups() {
   const [page, setPage] = useState(1);
   const router = useRouter();
@@ -23,12 +35,9 @@ export default function FeaturedStartups() {
   // Fetch verified startups from API
   const { data, isLoading, isError } = useGetAllVerifiedStartupsQuery();
   const projects = data?.data?.startups || [];
-  console.log("PR", projects);
-
-  // Example filtering for sections
 
   // const additionalProjects = projects.slice(1, 5);
-  const recommendations = projects.slice(5);
+  const recommendations = projects.slice(2);
   const totalPages = Math.ceil(
     recommendations.length / RECOMMENDATIONS_PER_PAGE
   );
@@ -45,8 +54,11 @@ export default function FeaturedStartups() {
     (project) => project.category?.toLowerCase() === "technology"
   );
   const featured = techProjects[0];
-  // (first two projects)
-  const editorsChoice = projects.slice(0, 2);
+
+  const editorsChoice = projects
+    .slice()
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 2);
 
   const ProjectCard = ({ project, variant = "default", size = "medium" }) => {
     const isLarge = size === "large";
@@ -62,7 +74,7 @@ export default function FeaturedStartups() {
             onClick={() => router.push(`/startup/detail/${project._id}`)}
           >
             <Image
-              src={project.companyLogo || "/placeholder.svg"}
+              src={project.image || "/placeholder.svg"}
               alt={project.companyName}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -205,9 +217,7 @@ export default function FeaturedStartups() {
           </div>
         )}
         {!isLoading && !isError && projects.length === 0 && (
-          <div className="p-4 text-center text-sm text-gray-500">
-            No projects found.
-          </div>
+          <NoProjectsPlaceholder text="No projects found." />
         )}
 
         {/* Technological Projects */}
@@ -225,25 +235,33 @@ export default function FeaturedStartups() {
 
           <div className="flex flex-col lg:flex-row gap-8 items-start min-h-[400px]">
             <div className="w-full md:w-2/3 lg:w-[40%] h-auto lg:h-[calc(100vh-8rem)] flex-shrink-0">
-              {featured && (
+              {featured ? (
                 <ProjectCard
                   key={featured._id}
                   project={featured}
                   variant="featured"
                   size="large"
                 />
+              ) : (
+                <NoProjectsPlaceholder text="No featured project found." />
               )}
             </div>
 
-            <div className="w-full md:w-full lg:w-[60%] grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-6 h-auto">
-              {techProjects.slice(1).map((project) => (
-                <ProjectCard
-                  key={project._id}
-                  project={project}
-                  variant="recommended"
-                  size="medium"
-                />
-              ))}
+            <div className="w-full md:w-full lg:w-[60%] grid grid-cols-1 md:grid-cols-2 gap-6 h-auto">
+              {techProjects.slice(1).length > 0 ? (
+                techProjects
+                  .slice(1)
+                  .map((project) => (
+                    <ProjectCard
+                      key={project._id}
+                      project={project}
+                      variant="recommended"
+                      size="medium"
+                    />
+                  ))
+              ) : (
+                <NoProjectsPlaceholder text="No more technological startups" />
+              )}
             </div>
           </div>
         </section>
@@ -262,14 +280,18 @@ export default function FeaturedStartups() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 items-start">
-            {pagedRecommendations.map((project) => (
-              <ProjectCard
-                key={project._id}
-                project={project}
-                variant="recommended"
-                size="medium"
-              />
-            ))}
+            {pagedRecommendations.length > 0 ? (
+              pagedRecommendations.map((project) => (
+                <ProjectCard
+                  key={project._id}
+                  project={project}
+                  variant="recommended"
+                  size="medium"
+                />
+              ))
+            ) : (
+              <NoProjectsPlaceholder text="No recommended startups found" />
+            )}
           </div>
 
           {/* Pagination */}
@@ -342,14 +364,18 @@ export default function FeaturedStartups() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
-            {nonTechProjects.map((project) => (
-              <ProjectCard
-                key={`non-tech-${project._id}`}
-                project={project}
-                variant="trending"
-                size="small"
-              />
-            ))}
+            {nonTechProjects.length > 0 ? (
+              nonTechProjects.map((project) => (
+                <ProjectCard
+                  key={`non-tech-${project._id}`}
+                  project={project}
+                  variant="trending"
+                  size="small"
+                />
+              ))
+            ) : (
+              <NoProjectsPlaceholder text="No non-technological startups found" />
+            )}
           </div>
         </section>
 
@@ -357,22 +383,24 @@ export default function FeaturedStartups() {
         <section className="mb-16">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Editor&apos;s Choice
-              </h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Others</h2>
               <p className="text-gray-600">Hand-picked exceptional projects</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            {editorsChoice.map((project) => (
-              <ProjectCard
-                key={`featured-${project._id}`}
-                project={project}
-                variant="featured"
-                size="large"
-              />
-            ))}
+            {editorsChoice.length > 0 ? (
+              editorsChoice.map((project) => (
+                <ProjectCard
+                  key={`featured-${project._id}`}
+                  project={project}
+                  variant="featured"
+                  size="large"
+                />
+              ))
+            ) : (
+              <NoProjectsPlaceholder text="No featured startups found" />
+            )}
           </div>
         </section>
 

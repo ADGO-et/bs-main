@@ -48,16 +48,16 @@ export default function ProjectCard({
         transition={{ duration: 0.3, delay: index * 0.05 }}
         className="border rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <div className="relative h-12 w-12 rounded-md overflow-hidden">
             <Image
-              src={placeholderimg}
-              alt={project.companyName}
+              src={project.image}
+              alt={project.image}
               fill
-              className="object-cover rounded-full w-16 h-16"
+              className="object-contain rounded-full w-12 h-12"
             />
           </div>
-          <div>
+          <div className="min-w-0 w-full">
             <h3 className="font-medium">{project.companyName}</h3>
             <p className="text-sm text-gray-500 line-clamp-1">
               {project.description}

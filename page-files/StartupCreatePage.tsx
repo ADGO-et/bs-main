@@ -38,6 +38,7 @@ export default function StartupCreatePage() {
   );
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [companyLogo, setCompanyLogo] = useState<string>("");
 
   // Form states
   const [userFormData, setUserFormData] = useState({
@@ -60,6 +61,7 @@ export default function StartupCreatePage() {
     bankAccountHolderName: "",
     bankAccountNumber: "",
     swiftCode: "",
+    companyLogo: "",
   });
 
   const [projectFormData, setProjectFormData] = useState({
@@ -69,7 +71,8 @@ export default function StartupCreatePage() {
     phoneNumber: "",
     companyName: "",
     description: "",
-    document: "", // PDF file
+    document: "", //  file
+    companyLogo: "",
     companyRegistration: "",
     fundingGoal: "",
     category: "",
@@ -166,6 +169,7 @@ export default function StartupCreatePage() {
         videoLink: companyFormData.videoLink,
         status: "pending" as StartupStatus,
         howLong: Number(companyFormData.campaignDuration),
+        image: companyFormData.companyLogo,
       };
       console.log("payload", payload);
       try {
@@ -204,6 +208,7 @@ export default function StartupCreatePage() {
         category: projectFormData.category,
         status: "pending" as StartupStatus,
         howLong: Number(projectFormData.howLong),
+        image: projectFormData.companyLogo,
       };
       try {
         await createStartupByBsTeam(payload).unwrap();
@@ -459,7 +464,6 @@ export default function StartupCreatePage() {
   }
 
   if (startStep === 1) {
-    // Step 1: Choose flow
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-24 px-4 flex items-center justify-center">
         <div className="container mx-auto px-6 max-w-4xl">
@@ -770,6 +774,53 @@ export default function StartupCreatePage() {
                 </div>
 
                 <div className="space-y-3">
+                  <Label htmlFor="companyLogo">Company Logo/Image</Label>
+                  <CldUploadButton
+                    uploadPreset="ml_default"
+                    onSuccess={(result: any) => {
+                      if (result?.info?.secure_url) {
+                        setCompanyLogo(result.info.secure_url);
+                        setCompanyFormData((prev) => ({
+                          ...prev,
+                          companyLogo: result.info.secure_url,
+                        }));
+                        toast({
+                          title: "Success",
+                          description: "Logo uploaded successfully!",
+                          variant: "default",
+                        });
+                      }
+                    }}
+                    onError={(error: any) => {
+                      toast({
+                        title: "Upload failed",
+                        description: "Failed to upload logo. Please try again.",
+                        variant: "destructive",
+                      });
+                    }}
+                    className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100"
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                      <p className="mb-2 text-sm text-gray-500">
+                        <span className="font-semibold">Click to upload</span>{" "}
+                        or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Image files only (MAX. 5MB)
+                      </p>
+                    </div>
+                  </CldUploadButton>
+                  {companyLogo && (
+                    <img
+                      src={companyLogo}
+                      alt="Company Logo"
+                      className="h-16 mt-2 rounded shadow"
+                    />
+                  )}
+                </div>
+
+                <div className="space-y-3">
                   <Label htmlFor="description">
                     Quick Pitch / Company Overview*
                   </Label>
@@ -1016,7 +1067,7 @@ export default function StartupCreatePage() {
 
   if (creationType === "team") {
     return (
-      <div className="min-h-screen pt-24 pb-16 relative bg-gradient-to-r from-blue-50 to-white">
+      <div className="min-h-screen pt-24 pb-16 relative bg-gradient-to-r from-blue-50 to-white h-full">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="flex items-center mb-8">
             <Button
@@ -1131,6 +1182,61 @@ export default function StartupCreatePage() {
                   />
                 </div>
                 <div className="space-y-3 pt-2">
+                  <Label htmlFor="companyLogo">Company Logo*</Label>
+                  <CldUploadButton
+                    uploadPreset="ml_default"
+                    onSuccess={(result: any) => {
+                      if (result?.info?.secure_url) {
+                        setProjectFormData((prev) => ({
+                          ...prev,
+                          companyLogo: result.info.secure_url,
+                        }));
+                        setCompanyLogo(result.info.secure_url);
+                        toast({
+                          title: "Success",
+                          description: "Document uploaded successfully!",
+                          variant: "default",
+                        });
+                      }
+                    }}
+                    onError={(error: any) => {
+                      console.error("Upload error:", error);
+                      toast({
+                        title: "Upload failed",
+                        description:
+                          "Failed to upload document. Please try again.",
+                        variant: "destructive",
+                      });
+                    }}
+                    className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100 ${
+                      !projectFormData.companyLogo && "border-red-500"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                      <p className="mb-2 text-sm text-gray-500">
+                        <span className="font-semibold">Click to upload</span>{" "}
+                        or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        PDF files only (MAX. 5MB)
+                      </p>
+                    </div>
+                  </CldUploadButton>
+                  {!projectFormData.companyLogo && (
+                    <p className="text-red-600 text-xs mt-1">
+                      Company logo is required.
+                    </p>
+                  )}
+                  {companyLogo && (
+                    <img
+                      src={companyLogo}
+                      alt="Company Logo"
+                      className="h-16 mt-2 rounded shadow"
+                    />
+                  )}
+                </div>
+                <div className="space-y-3 pt-2">
                   <Label htmlFor="description">
                     Brief Description of Your Project*
                   </Label>
@@ -1146,44 +1252,13 @@ export default function StartupCreatePage() {
                 </div>
                 <div className="space-y-3 pt-2">
                   <Label htmlFor="currentState" className="text-sm font-medium">
-                    Upload Your Document
+                    Upload Your Document <span className="text-red-500">*</span>
                   </Label>
-                  {/* <div className="border rounded-md p-4">
-                    <div className="flex items-center justify-center w-full">
-                      <label
-                        htmlFor="currentState"
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100"
-                      >
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                          <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">
-                              Click to upload
-                            </span>{" "}
-                            or drag and drop
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            PDF files only (MAX. 5MB)
-                          </p>
-                        </div>
-                        <input
-                          id="currentState"
-                          type="file"
-                          className="hidden"
-                          accept=".pdf"
-                          onChange={(e) =>
-                            handleFileChange(e, setCurrentStateFile)
-                          }
-                        />
-                      </label>
-                    </div>
-                  </div> */}
                   <div>
                     <div>
                       <CldUploadButton
                         uploadPreset="ml_default"
                         onSuccess={(result: any) => {
-                          // console.log("Upload result:", result);
                           if (result?.info?.secure_url) {
                             setProjectFormData((prev) => ({
                               ...prev,
@@ -1206,7 +1281,9 @@ export default function StartupCreatePage() {
                             variant: "destructive",
                           });
                         }}
-                        className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100"
+                        className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100 ${
+                          !projectFormData.document && "border-red-500"
+                        }`}
                       >
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <Upload className="w-8 h-8 mb-2 text-gray-500" />
@@ -1221,6 +1298,11 @@ export default function StartupCreatePage() {
                           </p>
                         </div>
                       </CldUploadButton>
+                      {!projectFormData.document && (
+                        <p className="text-red-600 text-xs mt-1">
+                          Document is required.
+                        </p>
+                      )}
                       {projectFormData.document && (
                         <p className="text-green-600 text-sm mt-2">
                           Document uploaded successfully!

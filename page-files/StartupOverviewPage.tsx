@@ -41,8 +41,8 @@ const SearchBar = dynamic(
 );
 
 const categories = [
-  { id: "technology", label: "Technology", count: 15 },
-  { id: "non-technology", label: "Non-Technology", count: 5 },
+  { id: "technology", label: "Technology" },
+  { id: "non-technology", label: "Non-Technology" },
 ];
 
 const locations = [
@@ -132,77 +132,6 @@ export default function StartupOverviewPage() {
 
   return (
     <div className="min-h-screen pt-0 pb-16 relative overflow-hidden">
-      {/* Background patterns */}
-      <div className="absolute -left-40 top-0 opacity-10">
-        <svg
-          width="400"
-          height="400"
-          viewBox="0 0 400 400"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle
-            cx="200"
-            cy="200"
-            r="200"
-            stroke="#FFA500"
-            strokeWidth="0.5"
-            fill="none"
-          />
-          <circle
-            cx="200"
-            cy="200"
-            r="180"
-            stroke="#FFA500"
-            strokeWidth="0.5"
-            fill="none"
-          />
-          <circle
-            cx="200"
-            cy="200"
-            r="160"
-            stroke="#FFA500"
-            strokeWidth="0.5"
-            fill="none"
-          />
-        </svg>
-      </div>
-
-      <div className="absolute -right-40 bottom-0 opacity-10">
-        <svg
-          width="400"
-          height="400"
-          viewBox="0 0 400 400"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle
-            cx="200"
-            cy="200"
-            r="200"
-            stroke="#3B82F6"
-            strokeWidth="0.5"
-            fill="none"
-          />
-          <circle
-            cx="200"
-            cy="200"
-            r="180"
-            stroke="#3B82F6"
-            strokeWidth="0.5"
-            fill="none"
-          />
-          <circle
-            cx="200"
-            cy="200"
-            r="160"
-            stroke="#3B82F6"
-            strokeWidth="0.5"
-            fill="none"
-          />
-        </svg>
-      </div>
-
       <div className="container mx-auto px-4">
         <MotionDiv
           initial={{ opacity: 0, y: 20 }}
