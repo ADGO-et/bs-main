@@ -36,7 +36,7 @@ export interface FormData {
     startDate?: Date
     endDate?: Date
     description: string
-    // currentlyWorking?: boolean
+  currentlyWorking?: boolean
     }>
   education: Array<{
     institution: string
@@ -102,35 +102,46 @@ export function JobApplicationForm() {
   }
 
   const buildPayload = (): creatingTalentPayload => {
+    const experience = formData.experience.map((e) => {
+      const obj: Record<string, unknown> = {
+        title: e.title,
+        company: e.company,
+        description: e.description,
+      }
+      if (e.startDate) obj.startDate = e.startDate.toISOString().split("T")[0]
+      // Only include endDate if provided and not currently working
+      if (e.endDate && !e.currentlyWorking) obj.endDate = e.endDate.toISOString().split("T")[0]
+      return obj
+    }) as creatingTalentPayload["experience"]
+
+    const education = formData.education.map((e) => {
+      const obj: Record<string, unknown> = {
+        degree: e.degree,
+        institution: e.institution,
+      }
+      if (e.startDate) obj.startDate = e.startDate.toISOString().split("T")[0]
+      if (e.endDate) obj.endDate = e.endDate.toISOString().split("T")[0]
+      return obj
+    }) as creatingTalentPayload["education"]
+
     return {
       firstName: formData.firstName,
       lastName: formData.lastName,
       profession: formData.profession,
       addressLine: formData.address,
-  location: formData.location,
+      location: formData.location,
       category: formData.category,
       description: formData.description,
       email: formData.email,
       phone: formData.phone,
       skills: formData.skills,
-      experience: formData.experience.map((e) => ({
-        title: e.title,
-        company: e.company,
-        startDate: e.startDate ? e.startDate.toISOString().split("T")[0] : "",
-        endDate: e.endDate ? e.endDate.toISOString().split("T")[0] : "",
-        description: e.description,
-      })),
-      education: formData.education.map((e) => ({
-        degree: e.degree,
-        institution: e.institution,
-        startDate: e.startDate ? e.startDate.toISOString().split("T")[0] : "",
-        endDate: e.endDate ? e.endDate.toISOString().split("T")[0] : "",
-      })),
+      experience,
+      education,
       educationalFiles: formData.educationalFiles,
       profilePic: formData.profilePic || "",
       period: formData.period === "fulltime" ? "fullTime" : "partTime",
       videoLink: formData.videoLink || "",
-  isAvailable: formData.isAvailable,
+      isAvailable: formData.isAvailable,
     }
   }
 

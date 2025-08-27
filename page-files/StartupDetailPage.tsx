@@ -83,6 +83,17 @@ export default function StartupDetailPage() {
     )
   }
 
+  // Helper to safely derive an initial from author (string or object)
+  const getAuthorInitial = (author: unknown) => {
+    if (!author) return "U"
+    if (typeof author === "string") return author[0] || "U"
+    if (typeof author === "object") {
+      const a = author as { firstName?: string; username?: string; email?: string }
+      return a.firstName?.[0] || a.username?.[0] || a.email?.[0] || "U"
+    }
+    return "U"
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen pt-0 pb-16 flex items-center justify-center">
@@ -130,16 +141,16 @@ export default function StartupDetailPage() {
           <p className="text-gray-600 text-lg max-w-4xl mb-2">{project.description}</p>
         </div>
 
-        {project.videoLink && isValidVideoUrl(project.videoLink) && (
-          <div className="max-w-4xl mx-auto mb-10">
-            <div className="bg-white rounded-xl shadow-lg p-6">
+        {/* Video + Funding side by side */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10 items-stretch">
+          {project.videoLink && isValidVideoUrl(project.videoLink) && (
+            <div className="bg-white rounded-xl shadow-lg p-6 h-full flex flex-col">
               <div className="flex items-center gap-2 mb-4">
                 <Play className="text-blue-500" size={20} />
-                <h2 className="text-xl font-bold">Project Video</h2>
+                <h2 className="text-xl font-bold">Startup Introduction Video</h2>
               </div>
               <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-100">
                 {project.videoLink.includes("youtube.com") || project.videoLink.includes("youtu.be") ? (
-                  // YouTube embed
                   <iframe
                     src={`https://www.youtube.com/embed/${getYouTubeVideoId(project.videoLink)}`}
                     title="Project Video"
@@ -149,7 +160,6 @@ export default function StartupDetailPage() {
                     allowFullScreen
                   />
                 ) : project.videoLink.includes("vimeo.com") ? (
-                  // Vimeo embed
                   <iframe
                     src={`https://player.vimeo.com/video/${project.videoLink.split("/").pop()}`}
                     title="Project Video"
@@ -159,7 +169,6 @@ export default function StartupDetailPage() {
                     allowFullScreen
                   />
                 ) : (
-                  // Direct video file
                   <video controls className="w-full h-full object-cover" preload="metadata">
                     <source src={project.videoLink} type="video/mp4" />
                     <source src={project.videoLink} type="video/webm" />
@@ -168,40 +177,9 @@ export default function StartupDetailPage() {
                 )}
               </div>
             </div>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-          {/* Left: Project Details */}
-          <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-4">
-            <div>
-              <h2 className="text-xl font-bold mb-2">Startup Details</h2>
-              <ul className="text-gray-700 space-y-2">
-                <li>
-                  <span className="font-semibold">First Name:</span> {project.firstName}
-                </li>
-                <li>
-                  <span className="font-semibold">Last Name:</span> {project.lastName}
-                </li>
-                <li>
-                  <span className="font-semibold">Phone Number:</span> {project.phoneNumber}
-                </li>
-                <li>
-                  <span className="font-semibold">Status:</span> {project.status}
-                </li>
-                <li>
-                  <span className="font-semibold">Expired:</span> {project.isExpired ? "Yes" : "No"}
-                </li>
-                <li>
-                  <span className="font-semibold">Post Expiry Date:</span>{" "}
-                  {project.postExpiryDate ? new Date(project.postExpiryDate).toLocaleDateString() : "N/A"}
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Right: Funding Info Card */}
-          <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col gap-6">
+          )}
+          {/* Funding Info Card */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl shadow-lg p-8 flex flex-col gap-6 h-full">
             <div>
               <div className="flex flex-wrap gap-2 mb-4">
                 <Badge className="bg-blue-100 text-blue-700 font-semibold text-xs px-3 py-1 rounded-full shadow-sm">
@@ -234,7 +212,6 @@ export default function StartupDetailPage() {
                 Support This Project
               </Button>
             </PaymentDialog>
-            {/* Share and Like Buttons */}
             <div className="flex gap-4 items-center justify-between mt-2 w-full">
               <Button
                 variant="ghost"
@@ -264,8 +241,33 @@ export default function StartupDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Startup Details card moved below */}
+        <div className="bg-white border border-blue-200 hover:scale-105 duration-300 rounded-xl shadow-sm p-6 flex flex-col gap-4 mb-10">
+          <h2 className="text-xl font-bold mb-2">Startup Details</h2>
+            <ul className="text-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-8">
+              <li>
+                <span className="font-semibold">First Name:</span> {project.firstName}
+              </li>
+              <li>
+                <span className="font-semibold">Last Name:</span> {project.lastName}
+              </li>
+              <li>
+                <span className="font-semibold">Phone Number:</span> {project.phoneNumber}
+              </li>
+              <li>
+                <span className="font-semibold">Status:</span> {project.status}
+              </li>
+              <li>
+                <span className="font-semibold">Expired:</span> {project.isExpired ? "Yes" : "No"}
+              </li>
+              <li>
+                <span className="font-semibold">Post Expiry Date:</span> {project.postExpiryDate ? new Date(project.postExpiryDate).toLocaleDateString() : "N/A"}
+              </li>
+            </ul>
+        </div>
         {/* Comments Section */}
-        <div className="max-w-2xl mx-auto mt-12 bg-white rounded-xl shadow-sm p-6">
+  <div className="w-full mt-12 bg-gradient-to-r from-blue-100 to-blue-300 rounded-xl shadow-sm p-6">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <MessageSquare className="text-blue-500" size={20} />
             Community Discussion
@@ -281,9 +283,7 @@ export default function StartupDetailPage() {
                 <div key={comment._id} className="flex gap-4">
                   <div className="flex-shrink-0">
                     <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                      {typeof comment.author === "string"
-                        ? comment.author.charAt(0)
-                        : comment.author?.firstName?.charAt(0) || comment.author?.username?.charAt(0) || "U"}
+                      {getAuthorInitial(comment.author)}
                     </div>
                   </div>
                   <div>
@@ -309,7 +309,7 @@ export default function StartupDetailPage() {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Share your thoughts about this project..."
-              className="mb-3"
+              className="mb-3 border-black"
               disabled={postingComment}
             />
             <Button onClick={handleAddComment} className="bg-blue-600 hover:bg-blue-700" disabled={postingComment}>

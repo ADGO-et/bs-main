@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 import {
   Calendar,
   ChevronLeft,
@@ -31,6 +33,15 @@ function NoProjectsPlaceholder({ text }: { text: string }) {
 export default function FeaturedStartups() {
   const [page, setPage] = useState(1);
   const router = useRouter();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  const navigateToProject = (id: string) => {
+    if (!isAuthenticated) {
+      router.push("/auth/signin");
+      return;
+    }
+    router.push(`/startup/detail/${id}`);
+  };
 
   // Fetch verified startups from API
   const { data, isLoading, isError } = useGetAllVerifiedStartupsQuery();
@@ -64,14 +75,14 @@ export default function FeaturedStartups() {
     const isLarge = size === "large";
     const isSmall = size === "small";
 
-    return (
+  return (
       <div className="group relative">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
           <div
             className={`relative cursor-pointer overflow-hidden ${
               isLarge ? "h-80" : isSmall ? "h-32" : "h-48"
             }`}
-            onClick={() => router.push(`/startup/detail/${project._id}`)}
+      onClick={() => navigateToProject(project._id)}
           >
             <Image
               src={project.image || "/placeholder.svg"}
@@ -127,7 +138,7 @@ export default function FeaturedStartups() {
               className={`font-bold text-gray-900 mb-2 cursor-pointer hover:text-blue-600 transition-colors line-clamp-2 ${
                 isLarge ? "text-2xl" : isSmall ? "text-sm" : "text-lg"
               }`}
-              onClick={() => router.push(`/startup/detail/${project._id}`)}
+              onClick={() => navigateToProject(project._id)}
             >
               {project.projectName} {project.companyName}
             </h3>
@@ -160,10 +171,10 @@ export default function FeaturedStartups() {
                     <Button
                       size="sm"
                       className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md flex-1"
-                      // onClick={(e) => {
-                      //   e.stopPropagation();
-                      // }}
-                      onClick={() => router.push(`/startup/detail/${project._id}`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigateToProject(project._id);
+                      }}
                     >
                       Support Project
                     </Button>
@@ -174,7 +185,7 @@ export default function FeaturedStartups() {
                       className="text-blue-600 border-blue-200 hover:bg-blue-50 bg-transparent"
                       onClick={(e) => {
                         e.stopPropagation();
-                        router.push(`/startup/detail/${project._id}`);
+                        navigateToProject(project._id);
                       }}
                     >
                       See Details

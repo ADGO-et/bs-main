@@ -7,28 +7,28 @@ export interface creatingTalentPayload {
     addressLine: string;
     category: string;
     description: string;
-    email: string;
-    phone: string;
-    location: string;
-    skills: string[];
-    experience: {
-      title: string;
-      company: string;
-      startDate: string;
-      endDate: string;
-      description: string
+    email?: string;
+    phone?: string;
+    location?: string;
+    skills?: string[];
+    experience?: {
+      title?: string;
+      company?: string;
+      startDate?: string;
+      endDate?: string;
+      description?: string
     }[];
-    education:{
-      degree: string;
+    education?:{
+      degree?: string;
       institution: string;
-      startDate: string;
-      endDate: string;
-    }[] 
-    educationalFiles: string[];
-    profilePic: string;
-    period: 'fullTime' | 'partTime';
-    videoLink: string;
-    isAvailable: boolean;
+      startDate?: string;
+      endDate?: string;
+    }[]
+    educationalFiles?: string[];
+    profilePic?: string;
+    period?: 'fullTime' | 'partTime';
+    videoLink?: string;
+    isAvailable?: boolean;
 }
 
 
