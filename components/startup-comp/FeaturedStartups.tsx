@@ -129,7 +129,7 @@ export default function FeaturedStartups() {
               }`}
               onClick={() => router.push(`/startup/detail/${project._id}`)}
             >
-              {project.projectName}, {project.companyName}
+              {project.projectName} {project.companyName}
             </h3>
 
             <div className="flex items-center gap-3 text-gray-500 text-sm mb-3">
@@ -145,7 +145,7 @@ export default function FeaturedStartups() {
 
             <div className="flex gap-2 flex-wrap">
               <Badge variant="outline" className="text-xs font-medium">
-                {project.category}
+                {project.category}  
               </Badge>
             </div>
 
@@ -160,9 +160,10 @@ export default function FeaturedStartups() {
                     <Button
                       size="sm"
                       className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md flex-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
+                      // onClick={(e) => {
+                      //   e.stopPropagation();
+                      // }}
+                      onClick={() => router.push(`/startup/detail/${project._id}`)}
                     >
                       Support Project
                     </Button>

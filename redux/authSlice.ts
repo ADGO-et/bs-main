@@ -9,9 +9,16 @@ const initialState: AuthState = {
 };
 
 // Helper function to decode JWT and extract user info
+interface DecodedToken {
+  sub?: string;
+  email?: string;
+  role?: string;
+  [key: string]: unknown;
+}
+
 const getUserFromToken = (token: string) => {
   try {
-    const decoded: any = jwtDecode(token);
+    const decoded = jwtDecode<DecodedToken>(token);
     console.log("decode", decoded);
     return {
       id: decoded.sub,
@@ -25,15 +32,10 @@ const getUserFromToken = (token: string) => {
   }
 };
 
-// Initialize state from localStorage if available
-if (typeof window !== "undefined") {
-  const token = localStorage.getItem("accessToken");
-  if (token) {
-    initialState.accessToken = token;
-    initialState.isAuthenticated = true;
-    initialState.user = getUserFromToken(token);
-  }
-}
+// NOTE: Do NOT read from localStorage here (module init) because this file
+// executes on both server and client. Doing so makes server and client initial
+// states diverge and triggers React hydration warnings. Session restoration is
+// now handled in a client-only provider via useEffect.
 
 const authSlice = createSlice({
   name: "auth",

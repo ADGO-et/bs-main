@@ -5,34 +5,27 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Briefcase, User, CheckCircle } from "lucide-react";
+import { Briefcase } from "lucide-react";
+import { HeartHandshake, Upload, ArrowRight } from "lucide-react";
+import { useState } from "react";
+
 
 export default function JobsCoverPage() {
+  const [flippedIndex, setFlippedIndex] = useState<number | null>(null);
+
   const paths = [
     {
-      title: "I'm Hiring",
-      icon: <Briefcase className="w-8 h-8 text-blue-500" />,
-      description: "Find skilled professionals for your projects",
-      features: [
-        "Browse verified candidates",
-        "Filter by skills and experience",
-        "Direct messaging",
-        "Secure hiring process",
-      ],
-      cta: "Browse Candidates",
+      title: "You want to hire?",
+      icon: <HeartHandshake className="w-8 h-8" />,
+      steps: ["Check available skills", "Contact candidates"],
+      cta: "Browse Skills",
       href: "/job/overview",
     },
     {
-      title: "I'm a Freelancer",
-      icon: <User className="w-8 h-8 text-blue-500" />,
-      description: "Find work that matches your skills",
-      features: [
-        "Create your professional profile",
-        "Showcase your portfolio",
-        "Get matched with projects",
-        "Secure payments",
-      ],
-      cta: "Create Profile",
+      title: "You want to post your skill?",
+      icon: <Upload className="w-8 h-8" />,
+      steps: ["Post your skill", "Connect with Employers"],
+      cta: "Post Your Skill",
       href: "/job/add",
     },
   ];
@@ -75,43 +68,48 @@ export default function JobsCoverPage() {
       </section>
 
       {/* Dual Path Section */}
-      <section className="container mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:w-[50vw] mx-auto">
           {paths.map((path, index) => (
-            <motion.div
+            <div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              className="relative h-80 perspective-1000"
+              onMouseEnter={() => setFlippedIndex(index)}
+              onMouseLeave={() => setFlippedIndex(null)}
             >
-              <div className="flex justify-center mb-4">
-                <div className="p-4 bg-blue-100 rounded-full">{path.icon}</div>
+              <div
+                className={`relative w-full h-full transition-transform duration-500 preserve-3d ${
+                  flippedIndex === index ? "rotate-y-180" : ""
+                }`}
+              >
+                {/* Front Side */}
+                <div className="absolute inset-0 bg-white rounded-xl shadow-md p-8 flex flex-col items-center justify-center backface-hidden border-2 border-gray-100">
+                  <div className="text-blue-500 mb-4">{path.icon}</div>
+                  <h2 className="text-center text-2xl font-bold mb-2 text-wrap">
+                    {path.title}
+                  </h2>
+                </div>
+
+                {/* Back Side */}
+                <div className="absolute inset-0 bg-white rounded-xl shadow-md p-8 flex flex-col items-center justify-center backface-hidden rotate-y-180 border-2 border-blue-100">
+                  <h3 className="text-xl font-semibold mb-4">How it works</h3>
+                  <ul className="space-y-3 mb-6 text-center">
+                    {path.steps.map((step, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <span className="text-blue-500">✓</span> {step}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href={path.href}>
+                    <Button className="gap-2">
+                      {path.cta} <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              <h2 className="text-2xl font-bold mb-2 text-center">
-                {path.title}
-              </h2>
-              <p className="text-gray-600 mb-6 text-center">
-                {path.description}
-              </p>
-
-              <ul className="space-y-3 mb-8">
-                {path.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link href={path.href} className="flex justify-center">
-                <Button className="w-full">{path.cta}</Button>
-              </Link>
-            </motion.div>
+            </div>
           ))}
         </div>
-      </section>
     </div>
   );
 }

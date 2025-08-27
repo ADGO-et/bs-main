@@ -17,11 +17,11 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "@/redux/authSlice";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import logo from "@/public/logo/logo.svg";
+import logo from "@/public/logo/logo.png";
 
 export default function SignIn() {
-  const [email, setEmail] = useState("test@example.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -159,7 +159,7 @@ export default function SignIn() {
               className="mx-auto mb-8"
             />
             <h2 className="text-2xl font-bold text-center mb-4">
-              Sigma Funding Solutions
+              BoleStarter Funding Solutions
             </h2>
             <p className="text-center text-gray-600">
               Find the top funding solutions available for individuals, family

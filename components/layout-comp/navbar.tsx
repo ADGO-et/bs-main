@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { constants } from "buffer";
+// import { constants } from "buffer";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -15,14 +15,14 @@ import { useState } from "react";
 import { useRegisterUserMutation } from "@/redux/api/authApi";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import logo from "@/public/logo/logo.svg";
+import logo from "@/public/logo/logo.png";
 
 export default function SignUp() {
-  const [firstName, setFirstName] = useState("John");
-  const [lastName, setLastName] = useState("Doe");
-  const [username, setUsername] = useState("johndoe");
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [password, setPassword] = useState("password123");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -103,7 +103,7 @@ export default function SignUp() {
                 <Label htmlFor="firstName">First Name</Label>
                 <Input
                   id="firstName"
-                  placeholder="John"
+                  placeholder="Solomon"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   required
@@ -114,7 +114,7 @@ export default function SignUp() {
                 <Label htmlFor="lastName">Last Name</Label>
                 <Input
                   id="lastName"
-                  placeholder="Doe"
+                  placeholder="Alemu"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   required
@@ -126,7 +126,7 @@ export default function SignUp() {
               <Label htmlFor="username">Username</Label>
               <Input
                 id="username"
-                placeholder="johndoe"
+                placeholder="Sele"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -138,7 +138,7 @@ export default function SignUp() {
               <Input
                 id="email"
                 type="email"
-                placeholder="john.doe@example.com"
+                placeholder="Solomon@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -182,11 +182,11 @@ export default function SignUp() {
               />
               <Label htmlFor="terms" className="text-sm font-normal">
                 I agree to the{" "}
-                <Link href="/terms" className="text-blue-600 hover:underline">
+                <Link href="" className="text-blue-600 hover:underline">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-blue-600 hover:underline">
+                <Link href="" className="text-blue-600 hover:underline">
                   Privacy Policy
                 </Link>
               </Label>
@@ -215,8 +215,8 @@ export default function SignUp() {
 
       {/* Right side - Image */}
       <div className="hidden md:block w-1/2 bg-blue-50 relative">
-        <div className="absolute inset-0 flex items-center justify-center p-12">
-          <div className="max-w-md">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="max-w-md -translate-y-20" >
             <Image
               src={logo}
               alt="Sigma Funding Solutions"
@@ -228,8 +228,8 @@ export default function SignUp() {
               Join Our Community
             </h2>
             <p className="text-center text-gray-600">
-              Create an account to access funding opportunities, connect with
-              investors, and showcase your projects to potential supporters.
+              Create an account, connect with investors, and showcase your
+              projects to potential supporters.
             </p>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const contactusApi = createApi({
   reducerPath: "contactusApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et/api",
+    baseUrl: "https://bole.weytech.et:1289",
     // credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);

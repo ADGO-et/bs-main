@@ -3,6 +3,7 @@ import {
   StartupApproval,
   StartupCommentResponse,
   StartupCommentsListResponse,
+  StartupFund,
   StartupLikeResponse,
 } from "@/types/startupApi";
 import { creatingStartupWithBsTeamPayload } from "@/types/startupApi";
@@ -11,7 +12,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const startupApi = createApi({
   reducerPath: "startupApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et/api", // production
+    baseUrl: "https://bole.weytech.et:1289", // production
     // baseUrl: "http://localhost:5002", // local development
     // credentials: "include",
     prepareHeaders: (headers, { getState }) => {
@@ -121,6 +122,8 @@ export const startupApi = createApi({
     getStartupComments: builder.query<StartupCommentsListResponse, string>({
       query: (startupId) => `/startup/comments/${startupId}`,
     }),
+
+
     postStartupComment: builder.mutation<
       StartupCommentResponse,
       { startupId: string; content: string }
@@ -131,12 +134,35 @@ export const startupApi = createApi({
         body: { content },
       }),
     }),
+
+
     likeOrDislikeStartup: builder.mutation<StartupLikeResponse, string>({
       query: (id) => ({
         url: `/startup/${id}/like`,
         method: "PATCH",
       }),
     }),
+
+
+    FundStartup: builder.mutation<
+      any,
+      { id: string; fund: StartupFund }
+    >({
+      query: ({ id, fund }) => ({
+        url: `/startup/${id}/fund`,
+        method: "PATCH",
+        body: fund,
+      }),
+    }),
+
+
+    verifyPayment: builder.query<any, string>({
+      query: (tx_ref) => ({
+        url: `payments/verify/${tx_ref}`,
+        method: "GET",
+      }),
+    }),
+
   }),
 });
 
@@ -154,4 +180,6 @@ export const {
   useGetStartupCommentsQuery,
   usePostStartupCommentMutation,
   useLikeOrDislikeStartupMutation,
+  useFundStartupMutation,
+  useVerifyPaymentQuery,
 } = startupApi;

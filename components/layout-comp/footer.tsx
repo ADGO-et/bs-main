@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Twitter, Facebook, Instagram, Youtube } from "lucide-react";
+import logo from "@/public/logo/logo.png";
 
 export default function Footer() {
   return (
@@ -90,7 +92,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/mission"
+                  href="/about"
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Mission
@@ -98,7 +100,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/vision"
+                  href="/about"
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Vision
@@ -106,7 +108,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/values"
+                  href="/about"
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Values
@@ -154,8 +156,16 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-gray-800 text-sm text-gray-400">
-          <p>© Bole Starter, 2024 All rights Reserved</p>
+        <div className="mt-12 pt-6 border-t border-gray-800 text-sm text-gray-400 flex items-center justify-between gap-4">
+          <p className="shrink-0">© Bole Starter, 2024 All rights Reserved</p>
+          <div className="ml-auto flex items-center">
+            <Image
+              src={logo}
+              alt="Bole Starter Logo"
+              className="w-auto h-14 object-contain"
+              priority
+            />
+          </div>
         </div>
       </div>
     </footer>

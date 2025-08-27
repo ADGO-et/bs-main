@@ -110,3 +110,9 @@ export interface StartupLikeResponse {
     message: string;
   };
 }
+
+export interface StartupFund {
+  amount: number;
+  description: string;
+  commission_rate: number;
+}

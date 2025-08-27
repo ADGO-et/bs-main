@@ -2,19 +2,23 @@
 // @ts-nocheck
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { Calendar, User, ArrowLeft, Share2, ThumbsUp } from "lucide-react";
+import { Calendar, User, ArrowLeft, Share2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import BlogCard from "@/components/blog-comp/BlogCard";
 import { useParams } from "next/navigation";
 import { useGetBlogByIdQuery, useGetAllBlogsQuery } from "@/redux/api/blogApi";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function BlogDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
+  const { toast } = useToast();
+  const [shareSuccess, setShareSuccess] = useState(false);
 
   // Fetch blog by ID
   const { data, isLoading, isError } = useGetBlogByIdQuery(id);
@@ -30,23 +34,6 @@ export default function BlogDetailPage() {
     .sort(() => 0.5 - Math.random())
     .slice(0, 3);
 
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(blog?.likes?.length ?? 0);
-
-  useEffect(() => {
-    setLikeCount(blog?.likes?.length ?? 0);
-  }, [blog]);
-
-  const handleLike = () => {
-    if (liked) {
-      setLikeCount((prev) => prev - 1);
-    } else {
-      setLikeCount((prev) => prev + 1);
-    }
-    setLiked(!liked);
-    // Optionally, call likeBlog mutation here
-  };
-
   if (isLoading)
     return (
       <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
@@ -59,6 +46,54 @@ export default function BlogDetailPage() {
         <p>Blog not found.</p>
       </div>
     );
+
+  // Build a canonical universal link that works for both dev & prod.
+  // Prefer an explicitly configured public site URL so links created in a preview / SSR env are still production-safe.
+  const getCanonicalShareUrl = () => {
+    // Allow a NEXT_PUBLIC_SITE_URL env variable (e.g. https://yourprod.com)
+    const baseEnv = process.env.NEXT_PUBLIC_SITE_URL;
+    // Fallback to current origin (only available client-side)
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const base = baseEnv && baseEnv.length > 0 ? baseEnv.replace(/\/$/, "") : origin;
+    // Current routing pattern: /blog/[id]
+    return `${base}/blog/${id}`;
+  };
+
+  const handleShare = async () => {
+    const shareUrl = getCanonicalShareUrl();
+    const title = blog.title || "Blog";
+    const text = blog.secondaryHeading || blog.content?.[0] || "Check out this blog";
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text, url: shareUrl });
+        toast({ title: "Shared", description: "Link shared successfully." });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
+        setShareSuccess(true);
+        toast({ title: "Link copied", description: "Universal link copied to clipboard." });
+        setTimeout(() => setShareSuccess(false), 2500);
+      } else {
+        // Legacy fallback: create a temporary input
+        const el = document.createElement("input");
+        el.value = shareUrl;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        setShareSuccess(true);
+        toast({ title: "Link copied", description: "Universal link copied to clipboard." });
+        setTimeout(() => setShareSuccess(false), 2500);
+      }
+    } catch (err) {
+      console.error("Share failed", err);
+      toast({
+        title: "Share failed",
+        variant: "destructive",
+        description: "Couldn't share the link. Try again or copy manually.",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen  pb-16 relative overflow-hidden">
@@ -120,15 +155,16 @@ export default function BlogDetailPage() {
         </svg>
       </div>
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 mt-10">
         <div className="mb-6">
-          <Link
+          <Button
             href="/blog"
-            className="inline-flex items-center text-gray-600 hover:text-blue-500 transition-colors"
+            onClick={() => router.push("/blog")}
+            className="inline-flex items-center text-white bg-blue-600 hover:bg-blue-600/80 transition-colors"
           >
             <ArrowLeft size={16} className="mr-2" />
             Back to Blogs
-          </Link>
+          </Button>
         </div>
 
         <motion.div
@@ -216,7 +252,7 @@ export default function BlogDetailPage() {
 
             {/* Social Actions */}
             <div className="flex items-center space-x-4 border-t pt-6">
-              <Button
+              {/* <Button
                 variant="outline"
                 size="sm"
                 className={`flex items-center gap-2 ${
@@ -226,14 +262,15 @@ export default function BlogDetailPage() {
               >
                 <ThumbsUp size={16} />
                 <span>{likeCount}</span>
-              </Button>
+              </Button> */}
               <Button
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
+                onClick={handleShare}
               >
-                <Share2 size={16} />
-                <span>Share</span>
+                {shareSuccess ? <Check size={16} /> : <Share2 size={16} />}
+                <span>{shareSuccess ? "Copied" : "Share"}</span>
               </Button>
             </div>
           </div>

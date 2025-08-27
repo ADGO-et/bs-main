@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import contactimgg from "@/public/contact.svg";
+import contactimgg from "@/public/contact.png";
 
 export default function ContactusPage() {
   const { toast } = useToast();
@@ -46,7 +46,7 @@ export default function ContactusPage() {
   };
 
   return (
-    <div className="min-h-screen pt-0 pb-16 relative overflow-hidden">
+    <div className="min-h-screen pt-0 pb-16 relative overflow-hidden md:w-[70vw] mx-auto mt-10">
       {/* Background patterns */}
       <div className="absolute -left-40 top-0 opacity-10">
         <svg

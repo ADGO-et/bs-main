@@ -12,7 +12,7 @@ import { RootState } from "../store";
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et/api",
+    baseUrl: "https://bole.weytech.et:1289",
     prepareHeaders: (headers, { getState }) => {
       headers.set("Content-Type", `application/json`);
 

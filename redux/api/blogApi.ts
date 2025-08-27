@@ -3,7 +3,7 @@ import { BlogListResponse, Blog, BlogResponse } from "@/types/blogApi";
 export const blogApi = createApi({
   reducerPath: "blogApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et/api",
+    baseUrl: "https://bole.weytech.et:1289",
     // credentials: "include",
     prepareHeaders: (headers, { getState }) => {
       headers.set("Content-Type", "application/json");
