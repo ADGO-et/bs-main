@@ -189,9 +189,9 @@ export default function FeaturedStartups() {
               <div className="overflow-hidden transition-all duration-500 ease-out max-h-0 group-hover:max-h-20 group-hover:mt-3">
                 <div className="opacity-0 group-hover:opacity-100 transition-all duration-500 delay-200 pt-3 border-t border-gray-100">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600">Raised</span>
+                    <span className="text-gray-600">Raising</span>
                     <span className="font-bold text-green-600">
-                      ${(Math.random() * 500).toFixed(1)}k
+                      {/* ${(Math.random() * 500).toFixed(1)}k */}
                     </span>
                   </div>
                 </div>
