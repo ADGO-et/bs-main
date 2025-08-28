@@ -1,9 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BlogListResponse, Blog, BlogResponse } from "@/types/blogApi";
+import { API_BASE_URL } from "./baseUrl";
+
 export const blogApi = createApi({
   reducerPath: "blogApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et:1289",
+    baseUrl: API_BASE_URL,
     // credentials: "include",
     prepareHeaders: (headers, { getState }) => {
       headers.set("Content-Type", "application/json");

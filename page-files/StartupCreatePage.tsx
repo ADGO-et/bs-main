@@ -1258,6 +1258,13 @@ export default function StartupCreatePage() {
                     <div>
                       <CldUploadButton
                         uploadPreset="ml_default"
+                        options={{
+                          resourceType: "raw",
+                          access_mode: "public",
+                          clientAllowedFormats: ["pdf"],
+                          maxFileSize: 5000000,
+                          type: "upload",
+                        }}
                         onSuccess={(result: any) => {
                           if (result?.info?.secure_url) {
                             setProjectFormData((prev) => ({

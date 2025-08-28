@@ -4,7 +4,7 @@
 
 import type React from "react";
 
-import Link from "next/link";
+// import Link from "next/link";
 import { ArrowLeft, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,13 +44,13 @@ export default function ForgotPassword() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <Link
+        <a
           href="/"
           className="inline-flex items-center text-sm text-gray-600 mb-8 hover:text-black transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to home
-        </Link>
+        </a>
 
         <div className="text-center mb-8">
           <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
@@ -100,12 +100,12 @@ export default function ForgotPassword() {
 
           <div className="text-center text-sm">
             Remember your password?{" "}
-            <Link
+            <a
               href="/auth/signin"
               className="text-blue-600 hover:underline font-medium"
             >
               Back to sign in
-            </Link>
+            </a>
           </div>
         </form>
       </div>

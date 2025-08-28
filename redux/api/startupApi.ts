@@ -8,12 +8,12 @@ import {
 } from "@/types/startupApi";
 import { creatingStartupWithBsTeamPayload } from "@/types/startupApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_BASE_URL } from "./baseUrl";
 
 export const startupApi = createApi({
   reducerPath: "startupApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et:1289", // production
-    // baseUrl: "http://localhost:5002", // local development
+    baseUrl: API_BASE_URL,
     // credentials: "include",
     prepareHeaders: (headers, { getState }) => {
       headers.set("Content-Type", "application/json");
@@ -123,7 +123,6 @@ export const startupApi = createApi({
       query: (startupId) => `/startup/comments/${startupId}`,
     }),
 
-
     postStartupComment: builder.mutation<
       StartupCommentResponse,
       { startupId: string; content: string }
@@ -135,7 +134,6 @@ export const startupApi = createApi({
       }),
     }),
 
-
     likeOrDislikeStartup: builder.mutation<StartupLikeResponse, string>({
       query: (id) => ({
         url: `/startup/${id}/like`,
@@ -143,11 +141,7 @@ export const startupApi = createApi({
       }),
     }),
 
-
-    FundStartup: builder.mutation<
-      any,
-      { id: string; fund: StartupFund }
-    >({
+    FundStartup: builder.mutation<any, { id: string; fund: StartupFund }>({
       query: ({ id, fund }) => ({
         url: `/startup/${id}/fund`,
         method: "PATCH",
@@ -155,14 +149,12 @@ export const startupApi = createApi({
       }),
     }),
 
-
     verifyPayment: builder.query<any, string>({
       query: (tx_ref) => ({
         url: `payments/verify/${tx_ref}`,
         method: "GET",
       }),
     }),
-
   }),
 });
 

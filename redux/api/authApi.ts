@@ -8,11 +8,12 @@ import {
 } from "@/types/authApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store";
+import { API_BASE_URL } from "./baseUrl";
 
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et:1289",
+    baseUrl: API_BASE_URL,
     prepareHeaders: (headers, { getState }) => {
       headers.set("Content-Type", `application/json`);
 

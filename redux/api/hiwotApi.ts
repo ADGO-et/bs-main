@@ -1,10 +1,11 @@
 import { creatingHiwotPayload } from "@/types/hiwotApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_BASE_URL } from "./baseUrl";
 
 export const hiwotApi = createApi({
   reducerPath: "hiwotApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et:1289",
+    baseUrl: API_BASE_URL,
     // credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);

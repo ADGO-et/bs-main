@@ -1,11 +1,16 @@
 import { creatingTalentPayload, SingleTalentResponse, TalentResponse } from "@/types/jobApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_BASE_URL } from "./baseUrl";
 
 export const jobApi = createApi({
   reducerPath: "jobApi",
   baseQuery: fetchBaseQuery({
+<<<<<<< HEAD
     baseUrl: "https://bole.weytech.et:1289", // production
     // baseUrl: "http://localhost:5002", // local development
+=======
+    baseUrl: API_BASE_URL,
+>>>>>>> c339744 (baseurl constant and document uploading)
     // credentials: "include",
     prepareHeaders: (headers, { getState }) => {
       headers.set("Content-Type", "application/json");
