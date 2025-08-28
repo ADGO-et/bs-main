@@ -1,16 +1,15 @@
-import { creatingTalentPayload, SingleTalentResponse, TalentResponse } from "@/types/jobApi";
+import {
+  creatingTalentPayload,
+  SingleTalentResponse,
+  TalentResponse,
+} from "@/types/jobApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_BASE_URL } from "./baseUrl";
 
 export const jobApi = createApi({
   reducerPath: "jobApi",
   baseQuery: fetchBaseQuery({
-<<<<<<< HEAD
-    baseUrl: "https://bole.weytech.et:1289", // production
-    // baseUrl: "http://localhost:5002", // local development
-=======
     baseUrl: API_BASE_URL,
->>>>>>> c339744 (baseurl constant and document uploading)
     // credentials: "include",
     prepareHeaders: (headers, { getState }) => {
       headers.set("Content-Type", "application/json");
@@ -35,26 +34,29 @@ export const jobApi = createApi({
     }),
 
     // get all talents with pagination and filters
-    getAllTalents: builder.query<TalentResponse, { page?: number; limit?: number; category?: string; period?: string }>({
+    getAllTalents: builder.query<
+      TalentResponse,
+      { page?: number; limit?: number; category?: string; period?: string }
+    >({
       query: ({ page = 1, limit = 10, category, period } = {}) => {
-      const params = new URLSearchParams();
-      params.append("page", page.toString());
-      params.append("limit", limit.toString());
-      if (category) params.append("category", category);
-      if (period) params.append("period", period);
+        const params = new URLSearchParams();
+        params.append("page", page.toString());
+        params.append("limit", limit.toString());
+        if (category) params.append("category", category);
+        if (period) params.append("period", period);
 
-      return {
-        url: `/talent?${params.toString()}`,
-        method: "GET",
-      };
+        return {
+          url: `/talent?${params.toString()}`,
+          method: "GET",
+        };
       },
     }),
 
     // get a specific talent by id (Admin only)
     getSingleTalent: builder.query<SingleTalentResponse, string>({
       query: (id) => ({
-      url: `/talent/${id}`,
-      method: "GET",
+        url: `/talent/${id}`,
+        method: "GET",
       }),
     }),
 

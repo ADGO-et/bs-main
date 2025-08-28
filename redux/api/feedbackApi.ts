@@ -5,11 +5,7 @@ import { API_BASE_URL } from "./baseUrl";
 export const feedbackApi = createApi({
   reducerPath: "feedbackApi",
   baseQuery: fetchBaseQuery({
-<<<<<<< HEAD
-    baseUrl: "https://bole.weytech.et:1289",
-=======
     baseUrl: API_BASE_URL,
->>>>>>> c339744 (baseurl constant and document uploading)
     prepareHeaders: (headers, { getState }) => {
       headers.set("Content-Type", "application/json");
       // Get token from Redux state
