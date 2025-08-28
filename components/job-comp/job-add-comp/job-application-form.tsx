@@ -252,7 +252,7 @@ export function JobApplicationForm() {
         </CardHeader>
         <CardContent>
           {successMessage && (
-            <Alert className="mb-4 border-green-500/50">
+            <Alert className="mb-4 border-green-500/50 bg-green-100">
               <AlertTitle>Success</AlertTitle>
               <AlertDescription>{successMessage}</AlertDescription>
             </Alert>
