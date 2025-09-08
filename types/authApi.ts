@@ -52,4 +52,5 @@ export interface User {
   likedStartups: string[];
   createdAt: string;
   updatedAt: string;
+  company: string;
 }

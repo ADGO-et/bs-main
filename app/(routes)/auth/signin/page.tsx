@@ -29,12 +29,20 @@ export default function SignIn() {
   const dispatch = useDispatch();
   const router = useRouter();
 
+  const capitalizeFirstLetterEmail = (email: string): string => {
+    const s = String(email ?? "").trim();
+    if (!s) return s;
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     try {
-      const result = await loginUser({ email, password }).unwrap();
+      const result = await loginUser({
+        email: capitalizeFirstLetterEmail(email),
+        password,
+      }).unwrap();
 
       if (result.status === "success" && result.data.accessToken) {
         dispatch(setCredentials({ accessToken: result.data.accessToken }));

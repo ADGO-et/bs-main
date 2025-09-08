@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { AuthState } from "@/types/authApi";
 import { jwtDecode } from "jwt-decode";
+import companyApi from "./api/companyApi";
 
 const initialState: AuthState = {
   user: null,
@@ -13,6 +14,7 @@ interface DecodedToken {
   sub?: string;
   email?: string;
   role?: string;
+  company?: string;
   [key: string]: unknown;
 }
 
@@ -24,7 +26,8 @@ const getUserFromToken = (token: string) => {
       id: decoded.sub,
       email: decoded.email,
       role: decoded.role,
-      username: decoded.email.split("@")[0], // Extracting username from email as a fallback
+      username: decoded.email.split("@")[0],
+      company: decoded.company || null,
     };
   } catch (error) {
     console.error("Failed to decode token:", error);
@@ -52,6 +55,10 @@ const authSlice = createSlice({
         localStorage.setItem("accessToken", accessToken);
       }
     },
+    setUser: (state, action: PayloadAction<any | null>) => {
+      state.user = action.payload;
+      state.isAuthenticated = !!action.payload;
+    },
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
@@ -65,5 +72,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, setUser, logout } = authSlice.actions;
 export default authSlice.reducer;
