@@ -16,55 +16,7 @@ import ApplicantFilters from "@/components/hiwot-comp/applicant-filters";
 import ApplicantList from "@/components/hiwot-comp/applicant-list";
 import type { HiwotApplicant } from "@/components/hiwot-comp/applicant-card";
 import placeholder from "@/public/hiwot-placeholder.png";
-
-// Mock data for applicants
-const mockApplicants: HiwotApplicant[] = Array.from({ length: 50 }, (_, i) => ({
-  id: `applicant-${i + 1}`,
-  firstName: ["Sarah", "Meron", "Hiwot", "Tigist", "Bethel"][i % 5],
-  lastName: ["Tadesse", "Abebe", "Kebede", "Haile", "Tesfaye"][i % 5],
-  description: [
-    "Needs support for cancer treatment",
-    "Requires surgery for heart condition",
-    "Seeking help for chronic kidney disease",
-    "Needs assistance for diabetes treatment",
-    "Requires support for physical therapy after accident",
-  ][i % 5],
-  phoneNumber: `+251 9${i % 10}${i % 10} ${i % 10}${i % 10}${i % 10} ${i % 10}${
-    i % 10
-  }${i % 10}${i % 10}`,
-  email: `${["sarah", "meron", "hiwot", "tigist", "bethel"][i % 5]}.${
-    ["tadesse", "abebe", "kebede", "haile", "tesfaye"][i % 5]
-  }@example.com`,
-  postDuration: ["30", "60", "90", "120", "180"][i % 5],
-  dateOfBirth: new Date(1980 + (i % 30), i % 12, (i % 28) + 1)
-    .toISOString()
-    .split("T")[0],
-  videoLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  medicalDocuments: [
-    `https://storage.example.com/medical/document-${i + 1}-1.pdf`,
-    `https://storage.example.com/medical/document-${i + 1}-2.pdf`,
-    `https://storage.example.com/medical/document-${i + 1}-3.pdf`,
-  ],
-  goalFund: `${(50000 + i * 10000).toString()}`,
-  bank: [
-    "Commercial Bank of Ethiopia",
-    "Dashen Bank",
-    "Awash Bank",
-    "Bank of Abyssinia",
-    "Zemen Bank",
-  ][i % 5],
-  bankAccount: `100${i}${i}${i}${i}${i}${i}`,
-  location: ["Addis Ababa", "Dire Dawa", "Bahir Dar", "Hawassa", "Mekelle"][
-    i % 5
-  ],
-  address: `${i + 1} Main Street, ${
-    ["Addis Ababa", "Dire Dawa", "Bahir Dar", "Hawassa", "Mekelle"][i % 5]
-  }`,
-  nationalId: `https://storage.example.com/id/id-${i + 1}.pdf`,
-  photo: placeholder,
-  fundingProgress: Math.floor(Math.random() * 100),
-  supporters: Math.floor(Math.random() * 100),
-}));
+import { useGetHiwotListQuery } from "@/redux/api/hiwotApi";
 
 const ageRanges = [
   { id: "0-18", label: "Children (0-18)", count: 15 },
@@ -81,11 +33,11 @@ const locations = [
 
 export default function HiwotOverviewPage() {
   // State
+  const { data, isLoading } = useGetHiwotListQuery();
+  const [filteredApplicants, setFilteredApplicants] = useState<any[]>([]);
+  const applicants = data?.data ?? [];
   const [searchTerm, setSearchTerm] = useState("");
   const [location, setLocation] = useState("all");
-  const [applicants, _] = useState<HiwotApplicant[]>(mockApplicants);
-  const [filteredApplicants, setFilteredApplicants] =
-    useState<HiwotApplicant[]>(mockApplicants);
   const [layout, setLayout] = useState<"list" | "grid">("list");
 
   const [selectedAgeRanges, setSelectedAgeRanges] = useState<string[]>([]);
