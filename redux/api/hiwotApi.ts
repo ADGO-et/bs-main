@@ -1,19 +1,25 @@
 import type { HiwotFund } from "@/types/hiwotApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_BASE_URL } from "./baseUrl";
+import { StartupFund } from "@/types/startupApi";
 
 export const hiwotApi = createApi({
   reducerPath: "hiwotApi",
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
     // credentials: "include",
-    prepareHeaders: (headers) => {
-      headers.set("Content-Type", `application/json`);
+    prepareHeaders: (headers, { getState }) => {
+      headers.set("Content-Type", "application/json");
+      // Get token from Redux state
+      const token = (getState() as any).auth.accessToken;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
       return headers;
     },
   }),
 
-  tagTypes: [],
+  tagTypes: ["Hiwot"],
   endpoints: (builder) => ({
     createHiwot: builder.mutation<{ data: HiwotFund }, Partial<HiwotFund>>({
       query: (body) => ({
@@ -52,6 +58,32 @@ export const hiwotApi = createApi({
       }),
       invalidatesTags: [{ type: "Hiwot", id: "LIST" }],
     }),
+    getHiwotComments: builder.query<{ data: any[] }, string>({
+      query: (id) => `/hiwot/${id}/comments`,
+    }),
+    postHiwotComment: builder.mutation<
+      { data: any },
+      { id: string; content: string; startup: string }
+    >({
+      query: ({ id, content, startup }) => ({
+        url: `/hiwot/${id}/comments`,
+        method: "POST",
+        body: { content },
+      }),
+    }),
+    likeOrDislikeHiwot: builder.mutation<{ data: any }, string>({
+      query: (id) => ({
+        url: `/hiwot/like/${id}`,
+        method: "POST",
+      }),
+    }),
+    FundHiwot: builder.mutation<any, { id: string; fund: StartupFund }>({
+      query: ({ id, fund }) => ({
+        url: `/hiwot/${id}/fund`,
+        method: "PATCH",
+        body: fund,
+      }),
+    }),
   }),
 });
 
@@ -61,5 +93,9 @@ export const {
   useGetHiwotByIdQuery,
   useUpdateHiwotMutation,
   useDeleteHiwotMutation,
+  useGetHiwotCommentsQuery,
+  usePostHiwotCommentMutation,
+  useLikeOrDislikeHiwotMutation,
+  useFundHiwotMutation,
 } = hiwotApi;
 export default hiwotApi;

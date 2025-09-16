@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import ApplicantCard from "./applicant-card";
 import { Button } from "@/components/ui/button";
 import Pagination from "@/components/common-comp/pagination";
 import type { HiwotFund } from "@/types/hiwotApi";
+import { useRouter } from "next/navigation";
 
 interface ApplicantListProps {
   applicants: HiwotFund[];
@@ -57,6 +58,7 @@ export default function ApplicantList({
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+  const router = useRouter();
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
@@ -136,7 +138,10 @@ export default function ApplicantList({
               </svg>
             </Button>
           </div>
-          <Button className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto">
+          <Button
+            className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto"
+            onClick={() => router.push("/hiwot/add")}
+          >
             Apply for Fund
           </Button>
         </div>

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronRight, Upload } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,7 +18,6 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { CldUploadButton } from "next-cloudinary";
 import { useCreateHiwotMutation } from "@/redux/api/hiwotApi";
 import type { RootState } from "@/redux/store";
 
@@ -51,13 +50,7 @@ export default function HiwotCreatePage() {
     howLong: 30,
   });
 
-  // STEP 3: Uploads
-  const [uploads, setUploads] = useState({
-    identification: "",
-    medicalCertificate: "",
-  });
-
-  // STEP 4: Banking
+  // STEP 3: Banking
   const [bank, setBank] = useState({
     bankName: "",
     bankAccountHolderName: "",
@@ -66,200 +59,35 @@ export default function HiwotCreatePage() {
   });
 
   const countries = [
-    "Afghanistan",
-    "Albania",
-    "Algeria",
-    "Andorra",
-    "Angola",
-    "Antigua and Barbuda",
-    "Argentina",
-    "Armenia",
-    "Australia",
-    "Austria",
-    "Azerbaijan",
-    "Bahamas",
-    "Bahrain",
-    "Bangladesh",
-    "Barbados",
-    "Belarus",
-    "Belgium",
-    "Belize",
-    "Benin",
-    "Bhutan",
-    "Bolivia",
-    "Bosnia and Herzegovina",
-    "Botswana",
-    "Brazil",
-    "Brunei",
-    "Bulgaria",
-    "Burkina Faso",
-    "Burundi",
-    "Cabo Verde",
-    "Cambodia",
-    "Cameroon",
-    "Canada",
-    "Central African Republic",
-    "Chad",
-    "Chile",
-    "China",
-    "Colombia",
-    "Comoros",
-    "Congo (Congo-Brazzaville)",
-    "Costa Rica",
-    "Croatia",
-    "Cuba",
-    "Cyprus",
-    "Czechia (Czech Republic)",
-    "Democratic Republic of the Congo",
-    "Denmark",
-    "Djibouti",
-    "Dominica",
-    "Dominican Republic",
-    "Ecuador",
-    "Egypt",
-    "El Salvador",
-    "Equatorial Guinea",
-    "Eritrea",
-    "Estonia",
-    'Eswatini (fmr. "Swaziland")',
     "Ethiopia",
-    "Fiji",
-    "Finland",
-    "France",
-    "Gabon",
-    "Gambia",
-    "Georgia",
-    "Germany",
-    "Ghana",
-    "Greece",
-    "Grenada",
-    "Guatemala",
-    "Guinea",
-    "Guinea-Bissau",
-    "Guyana",
-    "Haiti",
-    "Holy See",
-    "Honduras",
-    "Hungary",
-    "Iceland",
-    "India",
-    "Indonesia",
-    "Iran",
-    "Iraq",
-    "Ireland",
-    "Israel",
-    "Italy",
-    "Jamaica",
-    "Japan",
-    "Jordan",
-    "Kazakhstan",
     "Kenya",
-    "Kiribati",
-    "Kuwait",
-    "Kyrgyzstan",
-    "Laos",
-    "Latvia",
-    "Lebanon",
-    "Lesotho",
-    "Liberia",
-    "Libya",
-    "Liechtenstein",
-    "Lithuania",
-    "Luxembourg",
-    "Madagascar",
-    "Malawi",
-    "Malaysia",
-    "Maldives",
-    "Mali",
-    "Malta",
-    "Marshall Islands",
-    "Mauritania",
-    "Mauritius",
-    "Mexico",
-    "Micronesia",
-    "Moldova",
-    "Monaco",
-    "Mongolia",
-    "Montenegro",
-    "Morocco",
-    "Mozambique",
-    "Myanmar (Burma)",
-    "Namibia",
-    "Nauru",
-    "Nepal",
-    "Netherlands",
-    "New Zealand",
-    "Nicaragua",
-    "Niger",
-    "Nigeria",
-    "North Korea",
-    "North Macedonia",
-    "Norway",
-    "Oman",
-    "Pakistan",
-    "Palau",
-    "Palestine State",
-    "Panama",
-    "Papua New Guinea",
-    "Paraguay",
-    "Peru",
-    "Philippines",
-    "Poland",
-    "Portugal",
-    "Qatar",
-    "Romania",
-    "Russia",
-    "Rwanda",
-    "Saint Kitts and Nevis",
-    "Saint Lucia",
-    "Saint Vincent and the Grenadines",
-    "Samoa",
-    "San Marino",
-    "Sao Tome and Principe",
-    "Saudi Arabia",
-    "Senegal",
-    "Serbia",
-    "Seychelles",
-    "Sierra Leone",
-    "Singapore",
-    "Slovakia",
-    "Slovenia",
-    "Solomon Islands",
-    "Somalia",
-    "South Africa",
-    "South Korea",
-    "South Sudan",
+    "USA",
+    "UK",
+    "Canada",
+    "Germany",
+    "France",
+    "Italy",
     "Spain",
-    "Sri Lanka",
-    "Sudan",
-    "Suriname",
-    "Sweden",
-    "Switzerland",
-    "Syria",
-    "Tajikistan",
-    "Tanzania",
-    "Thailand",
-    "Timor-Leste",
-    "Togo",
-    "Tonga",
-    "Trinidad and Tobago",
-    "Tunisia",
-    "Turkey",
-    "Turkmenistan",
-    "Tuvalu",
-    "Uganda",
-    "Ukraine",
-    "United Arab Emirates",
-    "United Kingdom",
-    "United States of America",
-    "Uruguay",
-    "Uzbekistan",
-    "Vanuatu",
-    "Venezuela",
-    "Vietnam",
-    "Yemen",
-    "Zambia",
-    "Zimbabwe",
+  ];
+
+  const banks = [
+    "Commercial Bank of Ethiopia",
+    "Awash Bank",
+    "Dashen Bank",
+    "Bank of Abyssinia",
+    "Nib International Bank",
+    "Cooperative Bank of Oromia",
+    "Zemen Bank",
+    "United Bank",
+    "Abay Bank",
+    "Wegagen Bank",
+    "Berhan Bank",
+    "Lion International Bank",
+    "Bunna International Bank",
+    "Enat Bank",
+    "Oromia International Bank",
+    "Bank of America",
+    "Other",
   ];
 
   const handlePersonalChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -292,15 +120,12 @@ export default function HiwotCreatePage() {
         countryOfResidence: personal.countryOfResidence,
         description: project.description.trim(),
         fundingGoal: Number(project.fundingGoal),
-        campaignDuration: Number(project.campaignDuration),
         videoLink: project.videoLink.trim(),
         howLong: Number(project.howLong),
         bankName: bank.bankName,
         bankAccountHolderName: bank.bankAccountHolderName,
         bankAccountNumber: Number(bank.bankAccountNumber),
         swiftCode: bank.swiftCode,
-        identification: uploads.identification,
-        medicalCertificate: uploads.medicalCertificate,
         status: "pending",
       }).unwrap();
       toast({
@@ -333,11 +158,10 @@ export default function HiwotCreatePage() {
         Number(project.fundingGoal) > 0 &&
         project.videoLink &&
         project.campaignDuration &&
-        Number(project.campaignDuration) >= 1 &&
-        Number(project.campaignDuration) <= 90
+        Number(project.howLong) >= 1 &&
+        Number(project.howLong) <= 90
       );
-    if (step === 2) return uploads.identification && uploads.medicalCertificate;
-    if (step === 3)
+    if (step === 2)
       return (
         bank.bankName &&
         bank.bankAccountHolderName &&
@@ -347,11 +171,14 @@ export default function HiwotCreatePage() {
     return false;
   };
 
-  const stepsLabels = ["Personal", "Project", "Documents", "Banking", "Review"];
+  const stepsLabels = ["Personal", "Project", "Banking", "Review"];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-20 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div
+        className="max-w-4xl mx-auto"
+        style={{ maxHeight: "80vh", overflowY: "auto" }}
+      >
         {/* Header & Progress */}
         <div className="mb-10 flex items-center justify-between">
           <h1 className="text-3xl font-bold text-blue-700">
@@ -478,20 +305,9 @@ export default function HiwotCreatePage() {
                       required
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label>Campaign Duration (days)*</Label>
-                    <Input
-                      type="number"
-                      name="campaignDuration"
-                      min={1}
-                      max={90}
-                      value={project.campaignDuration}
-                      onChange={handleProjectChange}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>How Long (days)*</Label>
                     <Input
                       type="number"
                       name="howLong"
@@ -524,95 +340,28 @@ export default function HiwotCreatePage() {
           {step === 2 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <h2 className="text-xl font-semibold mb-6 text-blue-700">
-                Required Documents
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <Label>Identification (PDF/Image)*</Label>
-                  <CldUploadButton
-                    uploadPreset="ml_default"
-                    onSuccess={(result: any) => {
-                      if (result?.info?.secure_url) {
-                        setUploads((u) => ({
-                          ...u,
-                          identification: result.info.secure_url,
-                        }));
-                        toast({ title: "Uploaded identification" });
-                      }
-                    }}
-                    onError={() =>
-                      toast({
-                        title: "Upload failed",
-                        variant: "destructive",
-                      })
-                    }
-                    className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100"
-                  >
-                    <div className="flex flex-col items-center">
-                      <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                      <p className="text-xs text-gray-600">
-                        Click or drag to upload
-                      </p>
-                    </div>
-                  </CldUploadButton>
-                  {uploads.identification && (
-                    <p className="text-xs text-green-600">
-                      Identification attached
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-3">
-                  <Label>Medical Certificate (PDF/Image)*</Label>
-                  <CldUploadButton
-                    uploadPreset="ml_default"
-                    onSuccess={(result: any) => {
-                      if (result?.info?.secure_url) {
-                        setUploads((u) => ({
-                          ...u,
-                          medicalCertificate: result.info.secure_url,
-                        }));
-                        toast({ title: "Uploaded medical certificate" });
-                      }
-                    }}
-                    onError={() =>
-                      toast({
-                        title: "Upload failed",
-                        variant: "destructive",
-                      })
-                    }
-                    className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100"
-                  >
-                    <div className="flex flex-col items-center">
-                      <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                      <p className="text-xs text-gray-600">
-                        Click or drag to upload
-                      </p>
-                    </div>
-                  </CldUploadButton>
-                  {uploads.medicalCertificate && (
-                    <p className="text-xs text-green-600">
-                      Medical certificate attached
-                    </p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {step === 3 && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <h2 className="text-xl font-semibold mb-6 text-blue-700">
                 Banking Information
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Bank Name*</Label>
-                  <Input
-                    name="bankName"
+                  <Select
                     value={bank.bankName}
-                    onChange={handleBankChange}
-                    required
-                  />
+                    onValueChange={(v) =>
+                      setBank((b) => ({ ...b, bankName: v }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {banks.map((b) => (
+                        <SelectItem key={b} value={b}>
+                          {b}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Account Holder Name*</Label>
@@ -644,7 +393,7 @@ export default function HiwotCreatePage() {
             </motion.div>
           )}
 
-          {step === 4 && (
+          {step === 3 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <h2 className="text-xl font-semibold mb-6 text-blue-700">
                 Review & Submit
@@ -664,19 +413,20 @@ export default function HiwotCreatePage() {
                   <strong>Duration:</strong> {project.campaignDuration} days
                 </p>
                 <p>
+                  <strong>How Long:</strong> {project.howLong} days
+                </p>
+                <p>
                   <strong>Video:</strong> {project.videoLink}
-                </p>
-                <p>
-                  <strong>Identification:</strong>{" "}
-                  {uploads.identification ? "Attached" : "Missing"}
-                </p>
-                <p>
-                  <strong>Medical Certificate:</strong>{" "}
-                  {uploads.medicalCertificate ? "Attached" : "Missing"}
                 </p>
                 <p>
                   <strong>Bank:</strong> {bank.bankName} •{" "}
                   {bank.bankAccountHolderName}
+                </p>
+                <p>
+                  <strong>Account Number:</strong> {bank.bankAccountNumber}
+                </p>
+                <p>
+                  <strong>SWIFT/IBAN:</strong> {bank.swiftCode || "-"}
                 </p>
               </div>
               <div className="flex items-start space-x-3 mt-6">
@@ -706,7 +456,7 @@ export default function HiwotCreatePage() {
               <ArrowLeft className="w-4 h-4" /> Back
             </Button>
 
-            {step < 4 && (
+            {step < 3 && (
               <Button
                 type="button"
                 disabled={!stepValid()}
@@ -717,7 +467,7 @@ export default function HiwotCreatePage() {
               </Button>
             )}
 
-            {step === 4 && (
+            {step === 3 && (
               <Button type="submit" disabled={isLoading || !showTerms}>
                 {isLoading ? "Submitting..." : "Submit Hiwot Fund"}
               </Button>

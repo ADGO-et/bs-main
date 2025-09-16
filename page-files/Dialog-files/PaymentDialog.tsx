@@ -1,103 +1,156 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent } from "@/components/ui/card"
-import { CreditCard, Banknote, Shield, Percent, Rocket } from "lucide-react"
-import { useFundStartupMutation } from '@/redux/api/startupApi'
+import type React from "react";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  CreditCard,
+  Banknote,
+  Shield,
+  Percent,
+  Rocket,
+  HeartPulse,
+} from "lucide-react";
+import { useFundStartupMutation } from "@/redux/api/startupApi";
+import { useFundHiwotMutation } from "@/redux/api/hiwotApi";
 
 interface PaymentDialogProps {
-  children: React.ReactNode
-  startupId: string
+  children: React.ReactNode;
+  startupId?: string;
+  hiwotId?: string;
+  type?: "startup" | "hiwot";
 }
 
-export function PaymentDialog({ children, startupId }: PaymentDialogProps) {
-  const [amount, setAmount] = useState("")
-  const [description, setDescription] = useState("")
-  const [serviceFee, setServiceFee] = useState("5")
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
-  const [fundStartup, { isLoading: isProcessing }] = useFundStartupMutation()
+export function PaymentDialog({
+  children,
+  startupId,
+  hiwotId,
+  type = "startup",
+}: PaymentDialogProps) {
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [serviceFee, setServiceFee] = useState("5");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  // Choose mutation based on type
+  const [fundStartup, { isLoading: isProcessingStartup }] =
+    useFundStartupMutation();
+  const [fundHiwot, { isLoading: isProcessingHiwot }] = useFundHiwotMutation();
+  const isProcessing =
+    type === "hiwot" ? isProcessingHiwot : isProcessingStartup;
 
   const calculateFundingAmount = () => {
-    const totalAmount = Number.parseFloat(amount) || 0
-    const feePercentage = Number.parseFloat(serviceFee) || 5
-    const fee = (totalAmount * feePercentage) / 100
-    return totalAmount - fee
-  }
-
-  console.log("this is the startupId", startupId)
+    const totalAmount = Number.parseFloat(amount) || 0;
+    const feePercentage = Number.parseFloat(serviceFee) || 5;
+    const fee = (totalAmount * feePercentage) / 100;
+    return totalAmount - fee;
+  };
 
   const calculateServiceFee = () => {
-    const totalAmount = Number.parseFloat(amount) || 0
-    const feePercentage = Number.parseFloat(serviceFee) || 5
-    return (totalAmount * feePercentage) / 100
-  }
+    const totalAmount = Number.parseFloat(amount) || 0;
+    const feePercentage = Number.parseFloat(serviceFee) || 5;
+    return (totalAmount * feePercentage) / 100;
+  };
 
   const handlePayment = async () => {
-    if (!amount || Number.parseFloat(amount) <= 0) return
-    setError(null)
-    setSuccess(null)
+    if (!amount || Number.parseFloat(amount) <= 0) return;
+    setError(null);
+    setSuccess(null);
     try {
-      interface PaymentInitiationResponse {
-        status: string
-        message: string
-        data?: {
-          message?: string
-          paymentUrl?: string
-          tx_ref?: string
-        }
+      let res: any;
+      if (type === "hiwot") {
+        res = await fundHiwot({
+          id: hiwotId,
+          fund: {
+            amount: Number.parseFloat(amount),
+            description: description.trim(),
+            commission_rate: Number.parseFloat(serviceFee),
+          },
+        }).unwrap();
+      } else {
+        res = await fundStartup({
+          id: startupId,
+          fund: {
+            amount: Number.parseFloat(amount),
+            description: description.trim(),
+            commission_rate: Number.parseFloat(serviceFee),
+          },
+        }).unwrap();
       }
-      const res: PaymentInitiationResponse = await fundStartup({
-        id: startupId,
-        fund: {
-          amount: Number.parseFloat(amount),
-          description: description.trim(),
-          commission_rate: Number.parseFloat(serviceFee),
-        },
-      }).unwrap()
-
-  const paymentUrl = res?.data?.paymentUrl
-  type FundingResponseData = { tx_ref?: string; txRef?: string; paymentUrl?: string }
-  const dataPart: FundingResponseData | undefined = (res as { data?: FundingResponseData })?.data
-  const txRef = dataPart?.tx_ref || dataPart?.txRef
+      const paymentUrl = res?.data?.paymentUrl;
+      const dataPart:
+        | { tx_ref?: string; txRef?: string; paymentUrl?: string }
+        | undefined = res?.data;
+      const txRef = dataPart?.tx_ref || dataPart?.txRef;
       if (txRef) {
         try {
-          localStorage.setItem('startup_payment_tx_ref', txRef)
+          localStorage.setItem(`${type}_payment_tx_ref`, txRef);
         } catch (err) {
-          console.warn('Unable to store tx_ref in localStorage', err)
+          console.warn("Unable to store tx_ref in localStorage", err);
         }
       }
       if (paymentUrl) {
-        // Redirect user to external payment page
-        window.location.href = paymentUrl
+        window.location.href = paymentUrl;
       } else {
-        setSuccess(res?.message || 'Funding initiated.')
+        setSuccess(res?.message || "Funding initiated.");
       }
     } catch (e: unknown) {
-      const err = e as { data?: { message?: string }; message?: string; error?: string }
-      const apiMsg = err.data?.message || err.message || err.error
-      setError(apiMsg || 'Failed to initiate payment. Please try again.')
+      const err = e as {
+        data?: { message?: string };
+        message?: string;
+        error?: string;
+      };
+      const apiMsg = err.data?.message || err.message || err.error;
+      setError(apiMsg || "Failed to initiate payment. Please try again.");
     }
-  }
+  };
+
+  // Dynamic title/description/icon
+  const dialogTitle =
+    type === "hiwot" ? (
+      <span className="flex items-center gap-2">
+        <HeartPulse className="h-6 w-6 text-primary" />
+        <span className="text-2xl font-semibold">Hiwot Fund Payment</span>
+      </span>
+    ) : (
+      <span className="flex items-center gap-2">
+        <Rocket className="h-6 w-6 text-primary" />
+        <span className="text-2xl font-semibold">Startup Funding Payment</span>
+      </span>
+    );
+  const dialogDesc =
+    type === "hiwot"
+      ? "Secure payment for your Hiwot fund support"
+      : "Secure payment for your startup investment";
 
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg z-[9999] bg-blue-100">
         <DialogHeader className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2">
-            <Rocket className="h-6 w-6 text-primary" />
-            <DialogTitle className="text-2xl font-semibold">Startup Funding Payment</DialogTitle>
-          </div>
-          <p className="text-sm text-muted-foreground text-center">Secure payment for your startup investment</p>
+          {dialogTitle}
+          <p className="text-sm text-muted-foreground text-center">
+            {dialogDesc}
+          </p>
         </DialogHeader>
 
         <Card className="border-0 shadow-none bg-card/50">
@@ -105,7 +158,10 @@ export function PaymentDialog({ children, startupId }: PaymentDialogProps) {
             <div className="flex gap-4">
               {/* Amount Field */}
               <div className="flex-1 space-y-2">
-                <Label htmlFor="amount" className="text-sm font-medium flex items-center gap-2">
+                <Label
+                  htmlFor="amount"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
                   <Banknote className="h-4 w-4 text-primary" />
                   Total Amount (ETB) *
                 </Label>
@@ -135,24 +191,37 @@ export function PaymentDialog({ children, startupId }: PaymentDialogProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="z-[10000]">
-                    {Array.from({ length: 46 }, (_, i) => i + 5).map((percentage) => (
-                      <SelectItem key={percentage} value={percentage.toString()}>
-                        {percentage}% {percentage === 5 && "(Min)"}
-                      </SelectItem>
-                    ))}
+                    {Array.from({ length: 46 }, (_, i) => i + 5).map(
+                      (percentage) => (
+                        <SelectItem
+                          key={percentage}
+                          value={percentage.toString()}
+                        >
+                          {percentage}% {percentage === 5 && "(Min)"}
+                        </SelectItem>
+                      )
+                    )}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">Fee: {calculateServiceFee().toFixed(2)} ETB</p>
+                <p className="text-xs text-muted-foreground">
+                  Fee: {calculateServiceFee().toFixed(2)} ETB
+                </p>
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-medium">
-                Investment Description (Optional)
+                {type === "hiwot"
+                  ? "Support Description (Optional)"
+                  : "Investment Description (Optional)"}
               </Label>
               <Textarea
                 id="description"
-                placeholder="Describe your startup funding purpose..."
+                placeholder={
+                  type === "hiwot"
+                    ? "Describe your support for this Hiwot fund..."
+                    : "Describe your startup funding purpose..."
+                }
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="resize-none"
@@ -172,7 +241,11 @@ export function PaymentDialog({ children, startupId }: PaymentDialogProps) {
                   <span>-{calculateServiceFee().toFixed(2)} ETB</span>
                 </div>
                 <div className="border-t pt-2 flex justify-between font-semibold text-green-600">
-                  <span>Startup Funding Amount:</span>
+                  <span>
+                    {type === "hiwot"
+                      ? "Hiwot Fund Amount:"
+                      : "Startup Funding Amount:"}
+                  </span>
                   <span>{calculateFundingAmount().toFixed(2)} ETB</span>
                 </div>
               </div>
@@ -193,7 +266,9 @@ export function PaymentDialog({ children, startupId }: PaymentDialogProps) {
             {/* Payment Button */}
             <Button
               onClick={handlePayment}
-              disabled={!amount || Number.parseFloat(amount) <= 0 || isProcessing}
+              disabled={
+                !amount || Number.parseFloat(amount) <= 0 || isProcessing
+              }
               className="w-full h-12 text-base font-semibold"
             >
               {isProcessing ? (
@@ -212,11 +287,13 @@ export function PaymentDialog({ children, startupId }: PaymentDialogProps) {
             {/* Security Notice */}
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
               <Shield className="h-3 w-3" />
-              <span>Your investment is secured with 256-bit SSL encryption</span>
+              <span>
+                Your investment is secured with 256-bit SSL encryption
+              </span>
             </div>
           </CardContent>
         </Card>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
