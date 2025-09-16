@@ -30,6 +30,12 @@ export default function SignUp() {
   const [registerUser, { isLoading }] = useRegisterUserMutation();
   const router = useRouter();
 
+  const capitalizeFirstLetterEmail = (email: string): string => {
+    const s = String(email ?? "").trim();
+    if (!s) return s;
+    return s.charAt(0).toLowerCase() + s.slice(1);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -45,7 +51,7 @@ export default function SignUp() {
         firstName,
         lastName,
         username,
-        email,
+        email: capitalizeFirstLetterEmail(email),
         password,
       }).unwrap();
 
@@ -216,7 +222,7 @@ export default function SignUp() {
       {/* Right side - Image */}
       <div className="hidden md:block w-1/2 bg-blue-50 relative">
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="max-w-md -translate-y-20" >
+          <div className="max-w-md -translate-y-20">
             <Image
               src={logo}
               alt="Sigma Funding Solutions"

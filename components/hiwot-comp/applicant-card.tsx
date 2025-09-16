@@ -43,14 +43,14 @@ export default function ApplicantCard({
         className="border rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
         <div className="flex items-center gap-4">
-          <div className="relative h-12 w-12 rounded-full overflow-hidden">
+          {/* <div className="relative h-12 w-12 rounded-full overflow-hidden">
             <Image
               src={applicant.photo || placeholder}
               alt={`${applicant.firstName} ${applicant.lastName}`}
-              fill
-              className="object-cover"
+              className="object-contain w-4 h-4"
             />
-          </div>
+          </div> */}
+
           <div>
             <h3 className="font-medium">{`${applicant.firstName} ${applicant.lastName}`}</h3>
             <p className="text-sm text-gray-500 line-clamp-1">

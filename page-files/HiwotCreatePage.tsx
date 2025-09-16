@@ -45,7 +45,6 @@ export default function HiwotCreatePage() {
   const [project, setProject] = useState({
     description: "",
     fundingGoal: "",
-    campaignDuration: 30,
     videoLink: "",
     howLong: 30,
   });
@@ -122,6 +121,7 @@ export default function HiwotCreatePage() {
         fundingGoal: Number(project.fundingGoal),
         videoLink: project.videoLink.trim(),
         howLong: Number(project.howLong),
+        campaignDuration: Number(project.howLong),
         bankName: bank.bankName,
         bankAccountHolderName: bank.bankAccountHolderName,
         bankAccountNumber: Number(bank.bankAccountNumber),
@@ -157,7 +157,6 @@ export default function HiwotCreatePage() {
         project.fundingGoal &&
         Number(project.fundingGoal) > 0 &&
         project.videoLink &&
-        project.campaignDuration &&
         Number(project.howLong) >= 1 &&
         Number(project.howLong) <= 90
       );
@@ -409,11 +408,9 @@ export default function HiwotCreatePage() {
                 <p>
                   <strong>Goal:</strong> {project.fundingGoal} ETB
                 </p>
+
                 <p>
-                  <strong>Duration:</strong> {project.campaignDuration} days
-                </p>
-                <p>
-                  <strong>How Long:</strong> {project.howLong} days
+                  <strong>Campaign Duration:</strong> {project.howLong} days
                 </p>
                 <p>
                   <strong>Video:</strong> {project.videoLink}

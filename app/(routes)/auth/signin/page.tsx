@@ -32,7 +32,7 @@ export default function SignIn() {
   const capitalizeFirstLetterEmail = (email: string): string => {
     const s = String(email ?? "").trim();
     if (!s) return s;
-    return s.charAt(0).toUpperCase() + s.slice(1);
+    return s.charAt(0).toLowerCase() + s.slice(1);
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
