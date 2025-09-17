@@ -43,7 +43,7 @@ export default function HiwotDetailPage() {
     isError,
     refetch,
   } = useGetHiwotByIdQuery(id ?? "", { skip: !id });
-  const hiwot = response?.data;
+  const hiwot = response?.data.hiwot;
   const userId = useSelector((state: any) => state.auth?.user?.id);
   const { data: user, refetch: refetchUser } = useGetUserByIdQuery(userId);
 

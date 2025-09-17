@@ -59,22 +59,22 @@ export const hiwotApi = createApi({
       invalidatesTags: [{ type: "Hiwot", id: "LIST" }],
     }),
     getHiwotComments: builder.query<{ data: any[] }, string>({
-      query: (id) => `/hiwot/${id}/comments`,
+      query: (id) => `/hiwot/comments/${id}`,
     }),
     postHiwotComment: builder.mutation<
       { data: any },
       { id: string; content: string; startup: string }
     >({
       query: ({ id, content, startup }) => ({
-        url: `/hiwot/${id}/comments`,
+        url: `/hiwot/comments/${id}`,
         method: "POST",
         body: { content },
       }),
     }),
     likeOrDislikeHiwot: builder.mutation<{ data: any }, string>({
       query: (id) => ({
-        url: `/hiwot/like/${id}`,
-        method: "POST",
+        url: `/hiwot/${id}/like`,
+        method: "PATCH",
       }),
     }),
     FundHiwot: builder.mutation<any, { id: string; fund: StartupFund }>({

@@ -111,7 +111,7 @@ export default function HiwotCreatePage() {
     }
     try {
       await createHiwot({
-        creatorId,
+        // creatorId,
         firstName: personal.firstName.trim(),
         lastName: personal.lastName.trim(),
         email: personal.email.trim(),
@@ -126,7 +126,6 @@ export default function HiwotCreatePage() {
         bankAccountHolderName: bank.bankAccountHolderName,
         bankAccountNumber: Number(bank.bankAccountNumber),
         swiftCode: bank.swiftCode,
-        status: "pending",
       }).unwrap();
       toast({
         title: "Submitted",
@@ -306,7 +305,9 @@ export default function HiwotCreatePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Campaign Duration (days)*</Label>
+                    <Label>
+                      Campaign Duration (days - it should be less than 90 days)*
+                    </Label>
                     <Input
                       type="number"
                       name="howLong"
