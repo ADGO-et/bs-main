@@ -61,7 +61,7 @@ export default function HiwotDetailPage() {
   // Like
   const [likeOrDislikeHiwot, { isLoading: likeLoading }] =
     useLikeOrDislikeHiwotMutation();
-  const serverLikesCount = hiwot?.likesCount || 0;
+  const serverLikesCount = response?.data.likesCount || 0;
   const [isLiked, setIsLiked] = useState(false);
   const [localLikesCount, setLocalLikesCount] =
     useState<number>(serverLikesCount);
@@ -91,7 +91,6 @@ export default function HiwotDetailPage() {
     }
   };
 
-  // Support (payment) - implement as needed
   const handleSupport = () => {
     // Open payment dialog or redirect
   };
@@ -297,18 +296,35 @@ export default function HiwotDetailPage() {
                   Support Now
                 </Button>
               </PaymentDialog>
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-center gap-2 mb-4"
-                onClick={handleLike}
-                disabled={likeLoading}
-              >
-                <Heart size={16} fill={isLiked ? "currentColor" : "none"} />
-                <span>
-                  {localLikesCount} Like{localLikesCount === 1 ? "" : "s"}
-                </span>
-                {likeLoading ? "..." : isLiked ? "Liked" : "Like"}
-              </Button>
+              <div className="flex gap-4 items-center justify-between mt-2 w-full">
+                <Button
+                  variant="ghost"
+                  aria-label="Like"
+                  className="flex items-center gap-2 text-red-500 hover:bg-red-100 transition"
+                  onClick={handleLike}
+                  disabled={likeLoading}
+                >
+                  <Heart
+                    size={22}
+                    fill={isLiked ? "currentColor" : "none"}
+                    stroke="currentColor"
+                  />
+                  <span className="ml-1 text-base font-semibold">
+                    {localLikesCount}
+                  </span>
+                  {likeLoading ? "..." : isLiked ? "Liked" : "Like"}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 bg-transparent"
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                  }}
+                >
+                  <ExternalLink size={20} />
+                  Share Link
+                </Button>
+              </div>
             </div>
 
             {/* Comments Section */}
