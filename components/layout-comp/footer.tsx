@@ -157,7 +157,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-gray-800 text-sm text-gray-400 flex items-center justify-between gap-4">
-          <p className="shrink-0">© Bole Starter, 2024 All rights Reserved</p>
+          <p className="shrink-0">© Bole Starter, 2026 All rights Reserved</p>
           <div className="ml-auto flex items-center">
             <Image
               src={logo}

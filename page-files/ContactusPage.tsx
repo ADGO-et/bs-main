@@ -227,7 +227,7 @@ export default function ContactusPage() {
                   <MapPin className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-gray-600">545 Mavis Island, IL 59191</p>
+                  <p className="text-gray-600">Asmara Rd, Addis Ababa</p>
                 </div>
               </div>
 
@@ -236,7 +236,7 @@ export default function ContactusPage() {
                   <Phone className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-gray-600">+2034 4040 3030</p>
+                  <p className="text-gray-600">+251-911-266-116</p>
                 </div>
               </div>
 
@@ -245,7 +245,7 @@ export default function ContactusPage() {
                   <Mail className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-gray-600">hello@gmail.com</p>
+                  <p className="text-gray-600">info@bolestarter.com</p>
                 </div>
               </div>
             </div>

@@ -191,13 +191,13 @@ export function PaymentDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="z-[10000]">
-                    {Array.from({ length: 46 }, (_, i) => i + 5).map(
+                    {Array.from({ length: 46 }, (_, i) => i).map(
                       (percentage) => (
                         <SelectItem
                           key={percentage}
                           value={percentage.toString()}
                         >
-                          {percentage}% {percentage === 5 && "(Min)"}
+                          {percentage}%
                         </SelectItem>
                       )
                     )}

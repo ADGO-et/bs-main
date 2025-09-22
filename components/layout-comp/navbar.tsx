@@ -80,7 +80,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation & Search */}
-        <div className="hidden md:flex flex-col sm:flex-row items-center justify-center gap-4 min-w-2xl max-w-4xl pl-60">
+        {/* <div className="hidden md:flex flex-col sm:flex-row items-center justify-center gap-4 min-w-2xl max-w-4xl pl-60">
           <div className="relative w-full max-w-[400px]">
             <Search
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -94,10 +94,10 @@ export default function Navbar() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="hidden md:flex items-center space-x-4">
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
@@ -119,7 +119,7 @@ export default function Navbar() {
                 FR
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
 
           {isAuthenticated ? (
             <>
@@ -188,7 +188,7 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-md py-4 px-4 animate-in slide-in-from-top duration-300 z-50">
           {/* Mobile Search */}
-          <div className="mb-4 w-full">
+          {/* <div className="mb-4 w-full">
             <div className="relative w-full">
               <Search
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -202,7 +202,7 @@ export default function Navbar() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-          </div>
+          </div> */}
           <nav className="flex flex-col space-y-4">
             {pathname !== "/" && (
               <Link
