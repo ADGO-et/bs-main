@@ -52,7 +52,7 @@ export default function FundingDetailPage() {
       // Prepare table body
       const tableBody = [
         ["Transaction Ref (tx_ref)", funding.tx_ref || funding.chapaTxRef],
-        ["Reference", funding.reference || "-"],
+        // ["Reference", funding.reference || "-"],
         ["Status", funding.status],
         ["Amount", `${funding.amount} ETB`],
         [
