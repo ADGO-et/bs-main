@@ -50,7 +50,7 @@ export default function StartupDetailPage() {
 
   const project = data?.data?.startup;
   const serverLikesCount = data?.data?.likesCount || 0;
-  console.log("this is a project", serverLikesCount);
+  console.log("this is a project", project);
 
   const [likeOrDislikeStartup, { isLoading: likeLoading }] =
     useLikeOrDislikeStartupMutation();
@@ -69,14 +69,12 @@ export default function StartupDetailPage() {
   }, [user, project, serverLikesCount]);
   const handleLike = async () => {
     if (!id) return;
-    // optimistic update
     const prevLiked = isLiked;
     setIsLiked(!prevLiked);
     setLocalLikesCount((c) => (prevLiked ? Math.max(0, c - 1) : c + 1));
 
     try {
       await likeOrDislikeStartup(id).unwrap();
-      // authoritative sync: refetch project (likesCount) and user (likedStartups)
       await Promise.all([refetchProject(), refetchUser()]);
     } catch (err) {
       // revert on error
@@ -105,7 +103,6 @@ export default function StartupDetailPage() {
       setNewComment("");
       refetchComments();
     } catch (error) {
-      // Optionally show error toast
       console.log(error);
     }
   };
@@ -131,6 +128,17 @@ export default function StartupDetailPage() {
         url.includes(".webm"))
     );
   };
+
+  const getDaysToGo = (expiryDate: string | undefined) => {
+    if (!expiryDate) return 0;
+    const now = new Date();
+    const expiry = new Date(expiryDate);
+    const diff = expiry.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return days > 0 ? days : 0;
+  };
+
+  const daysToGo = getDaysToGo(project?.postExpiryDate);
 
   // Helper to safely derive an initial from author (string or object)
   const getAuthorInitial = (author: unknown) => {
@@ -286,9 +294,7 @@ export default function StartupDetailPage() {
                 <span className="text-xs text-gray-500">Backers</span>
               </div>
               <div className="flex flex-col items-center">
-                <span className="text-2xl text-blue-700">
-                  {project.howLong ?? 0}
-                </span>
+                <span className="text-2xl text-blue-700">{daysToGo}</span>
                 <span className="text-xs text-gray-500">Days To Go</span>
               </div>
             </div>

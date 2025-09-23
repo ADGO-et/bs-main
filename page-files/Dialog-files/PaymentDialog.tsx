@@ -47,7 +47,7 @@ export function PaymentDialog({
 }: PaymentDialogProps) {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [serviceFee, setServiceFee] = useState("5");
+  const [serviceFee, setServiceFee] = useState("0");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -60,14 +60,19 @@ export function PaymentDialog({
 
   const calculateFundingAmount = () => {
     const totalAmount = Number.parseFloat(amount) || 0;
-    const feePercentage = Number.parseFloat(serviceFee) || 5;
+    const feePercentage = Number.isNaN(Number(serviceFee))
+      ? 0
+      : Number(serviceFee);
+    console.log("fee", feePercentage);
     const fee = (totalAmount * feePercentage) / 100;
     return totalAmount - fee;
   };
 
   const calculateServiceFee = () => {
     const totalAmount = Number.parseFloat(amount) || 0;
-    const feePercentage = Number.parseFloat(serviceFee) || 5;
+    const feePercentage = Number.isNaN(Number(serviceFee))
+      ? 0
+      : Number(serviceFee);
     return (totalAmount * feePercentage) / 100;
   };
 

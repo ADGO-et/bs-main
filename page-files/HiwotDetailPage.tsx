@@ -44,6 +44,18 @@ export default function HiwotDetailPage() {
     refetch,
   } = useGetHiwotByIdQuery(id ?? "", { skip: !id });
   const hiwot = response?.data.hiwot;
+  console.log("hiw", hiwot);
+  const getDaysToGo = (expiryDate: string | undefined) => {
+    if (!expiryDate) return 0;
+    const now = new Date();
+    const expiry = new Date(expiryDate);
+    const diff = expiry.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return days > 0 ? days : 0;
+  };
+
+  const daysToGo = getDaysToGo(hiwot?.postExpiryDate);
+
   const userId = useSelector((state: any) => state.auth?.user?.id);
   const { data: user, refetch: refetchUser } = useGetUserByIdQuery(userId);
 
@@ -277,7 +289,7 @@ export default function HiwotDetailPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-800">
-                    {hiwot.campaignDuration}
+                    {daysToGo}
                   </div>
                   <div className="text-sm text-gray-600">Days to Go</div>
                 </div>
