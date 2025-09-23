@@ -191,16 +191,11 @@ export function PaymentDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="z-[10000]">
-                    {Array.from({ length: 46 }, (_, i) => i).map(
-                      (percentage) => (
-                        <SelectItem
-                          key={percentage}
-                          value={percentage.toString()}
-                        >
-                          {percentage}%
-                        </SelectItem>
-                      )
-                    )}
+                    {Array.from({ length: 46 }, (_, i) => (
+                      <SelectItem key={i} value={i.toString()}>
+                        {i === 0 ? "None" : `${i}%`}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">

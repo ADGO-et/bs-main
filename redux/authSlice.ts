@@ -17,7 +17,6 @@ interface DecodedToken {
   company?: string;
   firstName?: string;
   lastName?: string;
-  name?: string;
   [key: string]: unknown;
 }
 
@@ -33,7 +32,6 @@ const getUserFromToken = (token: string) => {
       company: decoded.company || null,
       firstName: decoded.firstName || "",
       lastName: decoded.lastName || "",
-      name: decoded.name || "",
     };
   } catch (error) {
     console.error("Failed to decode token:", error);
