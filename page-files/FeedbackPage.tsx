@@ -7,15 +7,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { useSubmitFeedbackMutation } from "@/redux/api/feedbackApi";
 
 export default function FeedbackPage() {
   const [name, setName] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
   const [experience, setExperience] = useState("");
-  const [rating, setRating] = useState(5); // 1-5 rating scale
+  const [rating, setRating] = useState(5);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  const [submitFeedback] = useSubmitFeedbackMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,20 +32,32 @@ export default function FeedbackPage() {
     }
 
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await submitFeedback({
+        fullName: name,
+        email,
+        contactNumber,
+        rating,
+        description: experience,
+      }).unwrap();
       toast({
         title: "Feedback submitted!",
         description: "Thank you for your feedback.",
       });
-      // Reset form
       setName("");
       setContactNumber("");
       setEmail("");
       setExperience("");
       setRating(5);
+    } catch (error: any) {
+      toast({
+        title: "Submission failed",
+        description: error?.data?.message || "Could not submit feedback.",
+        variant: "destructive",
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const ratingEmojis = [
@@ -145,9 +160,9 @@ export default function FeedbackPage() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="h-0.5 w-12 bg-purple-500"></div>
+            <div className="h-0.5 w-12 bg-blue-500"></div>
             <h1 className="text-3xl md:text-4xl font-bold">Feedback</h1>
-            <div className="h-0.5 w-12 bg-purple-500"></div>
+            <div className="h-0.5 w-12 bg-blue-500"></div>
           </div>
 
           <motion.div
@@ -236,7 +251,7 @@ export default function FeedbackPage() {
                 step={1}
                 value={[rating]}
                 onValueChange={(value) => setRating(value[0])}
-                className="py-4 [&>span:first-child]:bg-purple-500 [&>span:last-child]:bg-purple-500 [&>span:last-child]:ring-purple-300"
+                className="py-4 [&>span:first-child]:bg-blue-500 [&>span:last-child]:bg-blue-500 [&>span:last-child]:ring-blue-300"
               />
             </div>
 
@@ -256,7 +271,7 @@ export default function FeedbackPage() {
             <div className="flex justify-center pt-4">
               <Button
                 type="submit"
-                className="bg-purple-500 hover:bg-purple-600 text-white px-12  h-fit"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-12  h-fit"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Submitting..." : "Submit"}

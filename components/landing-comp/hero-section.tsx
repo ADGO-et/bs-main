@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -148,7 +147,7 @@ export default function HeroSection() {
             you.
           </p>
 
-          <Button className="w-full sm:w-auto bg-purple-500 hover:bg-purple-600 text-white py-6 px-8">
+          <Button className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white py-6 px-8">
             Explore Now
           </Button>
         </motion.div>

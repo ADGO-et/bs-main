@@ -27,7 +27,8 @@ export default function SearchBar({
   onSearchChange,
   onLocationChange,
   onSearch,
-}: SearchBarProps) {
+}: // onSearch,
+SearchBarProps) {
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <div className="relative flex-grow">
@@ -63,7 +64,7 @@ export default function SearchBar({
         </Select>
       </div>
       <Button
-        className="bg-purple-500 hover:bg-purple-600 text-white"
+        className="bg-blue-500 hover:bg-blue-600 text-white"
         onClick={onSearch}
       >
         Search

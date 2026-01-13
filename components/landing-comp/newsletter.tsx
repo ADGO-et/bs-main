@@ -33,7 +33,7 @@ export default function Newsletter() {
     <section className="py-16">
       <div className="container mx-auto px-4">
         <motion.div
-          className="bg-purple-400 rounded-lg overflow-hidden relative"
+          className="bg-blue-400 rounded-lg overflow-hidden relative"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -67,7 +67,7 @@ export default function Newsletter() {
             </div>
           </div>
 
-          {/* Blue corner accent */}
+          {/* blue corner accent */}
           <div className="absolute bottom-0 right-0 w-1/4 h-1/3 bg-blue-500 rounded-tl-[100px]"></div>
         </motion.div>
       </div>

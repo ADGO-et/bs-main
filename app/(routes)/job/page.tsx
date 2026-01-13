@@ -1,60 +1,56 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Briefcase, User, Search, FileText, CheckCircle } from "lucide-react";
+import { Briefcase } from "lucide-react";
+import { HeartHandshake, Upload, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 export default function JobsCoverPage() {
+  const [flippedIndex, setFlippedIndex] = useState<number | null>(null);
+  const router = useRouter();
+  const authUser = useSelector((state: any) => state.auth.user);
+
+  const userCompany = authUser?.company;
+  // console.log(userCompany, "userCompany");
+
+  const handlePathClick = (path: (typeof paths)[0]) => {
+    if (path.needsCompany) {
+      if (userCompany) {
+        router.push(path.href);
+      } else {
+        router.push("/job/company");
+      }
+      return;
+    }
+    if (path.href) router.push(path.href);
+  };
+
+  useEffect(() => {}, [userCompany]);
+
   const paths = [
     {
-      title: "I'm Hiring",
-      icon: <Briefcase className="w-8 h-8 text-purple-500" />,
-      description: "Find skilled professionals for your projects",
-      features: [
-        "Browse verified candidates",
-        "Filter by skills and experience",
-        "Direct messaging",
-        "Secure hiring process",
-      ],
-      cta: "Browse Candidates",
+      title: "You want to hire?",
+      icon: <HeartHandshake className="w-8 h-8" />,
+      steps: ["Check available skills", "Contact candidates"],
+      cta: "Browse Skills",
       href: "/job/overview",
+      needsCompany: true,
     },
     {
-      title: "I'm a Freelancer",
-      icon: <User className="w-8 h-8 text-purple-500" />,
-      description: "Find work that matches your skills",
-      features: [
-        "Create your professional profile",
-        "Showcase your portfolio",
-        "Get matched with projects",
-        "Secure payments",
-      ],
-      cta: "Create Profile",
+      title: "You want to post your skill?",
+      icon: <Upload className="w-8 h-8" />,
+      steps: ["Post your skill", "Connect with Employers"],
+      cta: "Post Your Skill",
       href: "/job/add",
-    },
-  ];
-
-  const benefits = [
-    {
-      icon: <CheckCircle className="w-6 h-6 text-purple-500" />,
-      title: "Verified Profiles",
-      description: "All candidates are thoroughly vetted",
-    },
-    {
-      icon: <Search className="w-6 h-6 text-purple-500" />,
-      title: "Smart Matching",
-      description: "Find the perfect fit quickly",
-    },
-    {
-      icon: <FileText className="w-6 h-6 text-purple-500" />,
-      title: "Secure Contracts",
-      description: "Protected agreements for both parties",
+      needsCompany: false,
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white pt-0">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pt-0">
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 pt-10 text-center">
         <motion.div
@@ -62,62 +58,54 @@ export default function JobsCoverPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="mx-auto bg-purple-100 text-purple-600 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+          <div className="mx-auto bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mb-6">
             <Briefcase className="w-8 h-8" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="text-purple-600">Talent Connect</span>: Where
+          <h1 className="text-4xl font-bold">
+            <span className="text-blue-600">Talent Connect</span>: Where
             Opportunities Meet Skills
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-            The platform connecting businesses with top female talent in
-            Ethiopia
-          </p>
         </motion.div>
       </section>
 
-      {/* Dual Path Section */}
-      <section className="container mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {paths.map((path, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:w-[50vw] mx-auto">
+        {paths.map((path, index) => (
+          <div
+            key={index}
+            className="relative h-80 perspective-1000"
+            onMouseEnter={() => setFlippedIndex(index)}
+            onMouseLeave={() => setFlippedIndex(null)}
+          >
+            <div
+              className={`relative w-full h-full transition-transform duration-500 preserve-3d ${
+                flippedIndex === index ? "rotate-y-180" : ""
+              }`}
             >
-              <div className="flex justify-center mb-4">
-                <div className="p-4 bg-purple-100 rounded-full">
-                  {path.icon}
-                </div>
+              <div className="absolute inset-0 bg-white rounded-xl shadow-md p-8 flex flex-col items-center justify-center backface-hidden border-2 border-gray-100">
+                <div className="text-blue-500 mb-4">{path.icon}</div>
+                <h2 className="text-center text-2xl font-bold mb-2 text-wrap">
+                  {path.title}
+                </h2>
               </div>
-              <h2 className="text-2xl font-bold mb-2 text-center">
-                {path.title}
-              </h2>
-              <p className="text-gray-600 mb-6 text-center">
-                {path.description}
-              </p>
 
-              <ul className="space-y-3 mb-8">
-                {path.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link href={path.href} className="flex justify-center">
-                <Button className="w-full">{path.cta}</Button>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      
+              {/* Back Side */}
+              <div className="absolute inset-0 bg-white rounded-xl shadow-md p-8 flex flex-col items-center justify-center backface-hidden rotate-y-180 border-2 border-blue-100">
+                <h3 className="text-xl font-semibold mb-4">How it works</h3>
+                <ul className="space-y-3 mb-6 text-center">
+                  {path.steps.map((step, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <span className="text-blue-500">✓</span> {step}
+                    </li>
+                  ))}
+                </ul>
+                <Button className="gap-2" onClick={() => handlePathClick(path)}>
+                  {path.cta} <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

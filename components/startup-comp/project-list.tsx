@@ -105,7 +105,7 @@ export default function ProjectList({
             <Button
               variant="outline"
               size="icon"
-              className={`h-8 w-8 ${layout === "grid" ? "bg-purple-50" : ""}`}
+              className={`h-8 w-8 ${layout === "grid" ? "bg-blue-50" : ""}`}
               onClick={() => onLayoutChange("grid")}
             >
               <svg
@@ -128,7 +128,7 @@ export default function ProjectList({
             <Button
               variant="outline"
               size="icon"
-              className={`h-8 w-8 ${layout === "list" ? "bg-purple-50" : ""}`}
+              className={`h-8 w-8 ${layout === "list" ? "bg-blue-50" : ""}`}
               onClick={() => onLayoutChange("list")}
             >
               <svg
@@ -152,7 +152,7 @@ export default function ProjectList({
             </Button>
           </div>
           <Button
-            className="bg-purple-500 hover:bg-purple-600 text-white w-full sm:w-auto"
+            className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto"
             onClick={handlePost}
           >
             Post a Project
@@ -166,7 +166,7 @@ export default function ProjectList({
           {currentProjects.length > 0 ? (
             currentProjects.map((project, index) => (
               <ProjectCard
-                key={project.id}
+                key={project._id}
                 project={project}
                 index={index}
                 layout="list"
@@ -185,7 +185,7 @@ export default function ProjectList({
           {currentProjects.length > 0 ? (
             currentProjects.map((project, index) => (
               <ProjectCard
-                key={project.id}
+                key={project._id}
                 project={project}
                 index={index}
                 layout="grid"

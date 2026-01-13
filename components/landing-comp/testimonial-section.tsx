@@ -1,44 +1,51 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
 const testimonials = [
   {
     id: 1,
-    name: "Sarah Johnson",
-    role: "Startup Founder, TechWave",
+    name: "Hana Getachew",
+    role: "Founder, Addis GreenTech",
     content:
-      "Bole Starter helped us secure funding within weeks. Their platform is intuitive and their support team is exceptional.",
+      "Bole Starter made it possible to secure early funding without complex red tape—it's a game-changer for Ethiopian startups.",
     rating: 5,
   },
   {
     id: 2,
-    name: "Michael Chen",
-    role: "Project Lead, GreenFuture",
+    name: "Samuel Tesfaye",
+    role: "Tech Entrepreneur, Mekelle",
     content:
-      "The flexibility of funding options is unmatched. We got exactly what our project needed without bureaucracy.",
+      "We connected with investors who truly believed in our vision—something that was nearly impossible before this platform",
     rating: 4,
   },
   {
     id: 3,
-    name: "Aisha Patel",
-    role: "CEO, HealthInnovate",
+    name: "Rahel Mulugeta",
+    role: "Startup Mentor & Ecosystem Builder",
     content:
-      "From application to disbursement, everything was transparent and fast. Highly recommend for African startups.",
+      "Finally, a funding platform built with local context in mind. It's fueling real innovation across Ethiopia.",
     rating: 5,
   },
   {
     id: 4,
-    name: "David Kim",
-    role: "CTO, AgroTech",
+    name: "Dr. Elias Mekuria",
+    role: "Policy Advisor, Ministry of Innovation & Technology",
     content:
-      "Their startup fund gave us the runway we needed to launch our MVP. Game-changing support!",
+      "This platform aligns perfectly with Ethiopia's digital transformation goals—smart, inclusive, and impact-driven.",
     rating: 5,
   },
 ];
 
+type Testimonial = {
+  id: number;
+  name: string;
+  role: string;
+  content: string;
+  rating: number;
+};
 export default function TestimonialCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -70,10 +77,10 @@ export default function TestimonialCarousel() {
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-b from-white to-purple-50 relative overflow-hidden">
+    <section className="py-16 bg-gradient-to-b from-white to-blue-50 relative overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden opacity-10">
-        <div className="absolute -left-40 -top-40 w-80 h-60 rounded-full bg-purple-200 blur-3xl"></div>
+        <div className="absolute -left-40 -top-40 w-80 h-60 rounded-full bg-blue-200 blur-3xl"></div>
         <div className="absolute -right-40 -bottom-40 w-80 h-60 rounded-full bg-blue-200 blur-3xl"></div>
       </div>
 
@@ -84,9 +91,9 @@ export default function TestimonialCarousel() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <p className="text-purple-600 max-w-2xl mx-auto">Testimonials</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            What Our Clients Say
+          <p className="text-blue-600 max-w-2xl mx-auto">Testimonials</p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            What People Say about BoleStarter
           </h2>
         </motion.div>
 
@@ -95,10 +102,10 @@ export default function TestimonialCarousel() {
           {/* Left Arrow */}
           <button
             onClick={prevTestimonial}
-            className="absolute -left-2 md:left-8 top-1/2 -translate-y-1/2  md:bg-white p-3 rounded-full md:shadow-lg hover:bg-purple-50 transition-colors z-30"
+            className="absolute -left-2 md:left-8 top-1/2 -translate-y-1/2  md:bg-white p-3 rounded-full md:shadow-lg hover:bg-blue-50 transition-colors z-30"
             aria-label="Previous testimonial"
           >
-            <ChevronLeft className="w-6 h-6 text-purple-600" />
+            <ChevronLeft className="w-6 h-6 text-blue-600" />
           </button>
 
           {/* Cards */}
@@ -152,10 +159,10 @@ export default function TestimonialCarousel() {
           {/* Right Arrow */}
           <button
             onClick={nextTestimonial}
-            className="absolute -right-2 md:right-8 top-1/2 -translate-y-1/2 md:bg-white p-3 rounded-full md:shadow-lg hover:bg-purple-50 transition-colors z-20"
+            className="absolute -right-2 md:right-8 top-1/2 -translate-y-1/2 md:bg-white p-3 rounded-full md:shadow-lg hover:bg-blue-50 transition-colors z-20"
             aria-label="Next testimonial"
           >
-            <ChevronRight className="w-6 h-6 text-purple-600" />
+            <ChevronRight className="w-6 h-6 text-blue-600" />
           </button>
         </div>
 
@@ -166,7 +173,7 @@ export default function TestimonialCarousel() {
               key={index}
               onClick={() => setCurrentIndex(index)}
               className={`w-3 h-3 rounded-full transition-all ${
-                index === currentIndex ? "bg-purple-600 w-6" : "bg-gray-300"
+                index === currentIndex ? "bg-blue-600 w-6" : "bg-gray-300"
               }`}
               aria-label={`Go to testimonial ${index + 1}`}
             />
@@ -181,19 +188,19 @@ function TestimonialCard({
   testimonial,
   isActive,
 }: {
-  testimonial: any;
+  testimonial: Testimonial;
   isActive: boolean;
 }) {
   return (
     <motion.div
       className={`bg-white p-6 md:p-8 rounded-xl shadow-md border ${
-        isActive ? "border-purple-300" : "border-gray-200"
+        isActive ? "border-blue-300" : "border-gray-200"
       } h-full flex flex-col`}
       whileHover={isActive ? { y: -5 } : {}}
     >
       <Quote
         className={`w-6 h-6 mb-4 rotate-180 ${
-          isActive ? "text-purple-500" : "text-gray-400"
+          isActive ? "text-blue-500" : "text-gray-400"
         }`}
       />
       <p

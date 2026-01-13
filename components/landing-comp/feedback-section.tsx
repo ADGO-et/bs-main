@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export function FeedbackSection() {
   return (
-    <section className="py-16 bg-purple-50">
+    <section className="py-16 bg-blue-50">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -57,7 +57,7 @@ export function FeedbackSection() {
               </div>
               <div className="w-full md:w-auto">
                 <Link href="/feedback">
-                  <button className="w-full bg-purple-500 hover:bg-purple-600 text-white px-8 py-4 rounded-lg transition-all">
+                  <button className="w-full bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg transition-all">
                     Give Feedback
                   </button>
                 </Link>

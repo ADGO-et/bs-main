@@ -1,15 +1,19 @@
-"use client"
+"use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PaginationProps {
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
-export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+export default function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: PaginationProps) {
   return (
     <div className="flex justify-center items-center mt-8">
       <Button
@@ -24,13 +28,13 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
 
       {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
         // Show pages around current page
-        let pageNum = i + 1
+        let pageNum = i + 1;
         if (totalPages > 5) {
           if (currentPage > 3) {
-            pageNum = currentPage - 3 + i
+            pageNum = currentPage - 3 + i;
           }
           if (currentPage > totalPages - 2) {
-            pageNum = totalPages - 4 + i
+            pageNum = totalPages - 4 + i;
           }
         }
 
@@ -38,18 +42,26 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
           <Button
             key={pageNum}
             variant={currentPage === pageNum ? "default" : "outline"}
-            className={`h-8 w-8 mx-1 ${currentPage === pageNum ? "bg-orange-500 hover:bg-orange-600 text-white" : ""}`}
+            className={`h-8 w-8 mx-1 ${
+              currentPage === pageNum
+                ? "bg-blue-500 hover:bg-blue-600 text-white"
+                : ""
+            }`}
             onClick={() => onPageChange(pageNum)}
           >
             {pageNum}
           </Button>
-        ) : null
+        ) : null;
       })}
 
       {totalPages > 5 && currentPage < totalPages - 2 && (
         <>
           <span className="mx-1">...</span>
-          <Button variant="outline" className="h-8 w-8 mx-1" onClick={() => onPageChange(totalPages)}>
+          <Button
+            variant="outline"
+            className="h-8 w-8 mx-1"
+            onClick={() => onPageChange(totalPages)}
+          >
             {totalPages}
           </Button>
         </>
@@ -65,5 +77,5 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>
-  )
+  );
 }

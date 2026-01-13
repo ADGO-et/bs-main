@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function AboutUsSection() {
   return (
-    <section className="py-16 bg-gradient-to-b from-white to-purple-50">
+    <section className="py-16 bg-gradient-to-b from-white to-blue-50">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -23,17 +23,17 @@ export default function AboutUsSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {[
             {
-              icon: <Target className="h-8 w-8 text-purple-500" />,
+              icon: <Target className="h-8 w-8 text-blue-500" />,
               title: "Mission",
               text: "Democratize access to funding for all great ideas.",
             },
             {
-              icon: <Award className="h-8 w-8 text-purple-500" />,
+              icon: <Award className="h-8 w-8 text-blue-500" />,
               title: "Vision",
               text: "Become the most trusted funding platform worldwide.",
             },
             {
-              icon: <Users className="h-8 w-8 text-purple-500" />,
+              icon: <Users className="h-8 w-8 text-blue-500" />,
               title: "Values",
               text: "Integrity, transparency, and client success.",
             },
@@ -56,7 +56,7 @@ export default function AboutUsSection() {
 
         <div className="text-center">
           <Link href="/about">
-            <button className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-all">
+            <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-all">
               Explore About Us →
             </button>
           </Link>

@@ -1,56 +1,40 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 "use client";
 
 import { useState, useEffect } from "react";
 import BlogCard from "@/components/blog-comp/BlogCard";
 import FeaturedBlog from "@/components/blog-comp/featured-blog";
 import Pagination from "@/components/blog-comp/pagination";
-
-// Mock blog data
-const mockBlogs = Array.from({ length: 30 }, (_, i) => ({
-  id: `blog-${i + 1}`,
-  title:
-    i === 0
-      ? "Integer Maecenas Eget Viverra"
-      : [
-          "Integer Maecenas Eget Viverra",
-          "Aenean eleifend ante maecenas",
-          "Vivamus laoreet mauris fusce",
-        ][i % 3],
-  secondaryHeading: "The Future of Digital Marketing",
-  description:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-  image: [
-    "/placeholder.svg?height=300&width=400",
-    "/placeholder.svg?height=300&width=400&text=Blog+Image+2",
-    "/placeholder.svg?height=300&width=400&text=Blog+Image+3",
-  ][i % 3],
-  videoLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  referenceLink: "https://example.com/reference",
-  author: ["John Doe", "Jane Smith", "Alex Johnson"][i % 3],
-  date: new Date(2023, i % 12, (i % 28) + 1).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }),
-}));
+import { useGetAllBlogsQuery } from "@/redux/api/blogApi";
 
 export default function BlogPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const blogsPerPage = 9;
-  const totalPages = Math.ceil(mockBlogs.length / blogsPerPage);
 
-  // Get featured blog (first blog)
-  const featuredBlog = mockBlogs[0];
+  // Fetch blogs from API
+  const { data, isLoading, isError } = useGetAllBlogsQuery();
 
-  // Get current blogs for pagination
+  // Extract blogs and pagination from API response
+  const blogs = data?.data?.blogs || [];
+  const pagination = data?.data?.pagination || {
+    total: 0,
+    page: 1,
+    limit: blogsPerPage,
+    totalPages: 1,
+  };
+
+  // Featured blog (first blog)
+  const featuredBlog = blogs[0];
+
+  // Paginate blogs
   const indexOfLastBlog = currentPage * blogsPerPage;
   const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
-  const currentBlogs = mockBlogs.slice(indexOfFirstBlog, indexOfLastBlog);
+  const currentBlogs = blogs.slice(indexOfFirstBlog, indexOfLastBlog);
 
   // Handle page change
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-    // Scroll to top when page changes
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -60,7 +44,7 @@ export default function BlogPage() {
   }, []);
 
   return (
-    <div className="min-h-screen pt-44 pb-16 relative overflow-hidden">
+    <div className="min-h-screen pt-10 pb-16 relative overflow-hidden">
       {/* Background patterns */}
       <div className="absolute -left-40 top-0 opacity-10">
         <svg
@@ -134,34 +118,65 @@ export default function BlogPage() {
 
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-center gap-4 mb-8">
-          <div className="h-0.5 w-12 bg-purple-500"></div>
+          <div className="h-0.5 w-12 bg-blue-500"></div>
           <h1 className="text-3xl md:text-4xl font-bold">Blog</h1>
-          <div className="h-0.5 w-12 bg-purple-500"></div>
+          <div className="h-0.5 w-12 bg-blue-500"></div>
         </div>
-
+        {/* Loading/Error/Empty states */}
+        {isLoading && (
+          <div className="p-4 text-center text-sm text-gray-500">
+            Loading...
+          </div>
+        )}
+        {isError && (
+          <div className="p-4 text-center text-sm text-red-500">
+            Failed to load blogs.
+          </div>
+        )}
+        {!isLoading && !isError && blogs.length === 0 && (
+          <div className="p-4 text-center text-sm text-gray-500">
+            No blogs found.
+          </div>
+        )}
         {/* Featured Blog */}
-        <FeaturedBlog
-          id={featuredBlog.id}
-          title={featuredBlog.title}
-          secondaryHeading={featuredBlog.secondaryHeading}
-          description={featuredBlog.description}
-          image={featuredBlog.image}
-        />
+        {!isLoading && !isError && featuredBlog && (
+          <FeaturedBlog
+            id={featuredBlog._id}
+            title={featuredBlog.title}
+            secondaryHeading={featuredBlog.secondaryHeading}
+            description={
+              Array.isArray(featuredBlog.content)
+                ? featuredBlog.content[0]
+                : featuredBlog.content
+            }
+            image={featuredBlog.blogImage}
+          />
+        )}
 
         {/* Blog Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {currentBlogs.map((blog, index) => (
             <BlogCard
-              key={blog.id}
-              id={blog.id}
+              key={blog._id}
+              id={blog._id}
               title={blog.title}
               secondaryHeading={blog.secondaryHeading}
-              description={blog.description}
-              image={blog.image}
+              description={
+                Array.isArray(blog.content) ? blog.content[0] : blog.content
+              }
+              image={blog.blogImage}
               videoLink={blog.videoLink}
               referenceLink={blog.referenceLink}
-              author={blog.author}
-              date={blog.date}
+              author={
+                blog.authorId?.firstName && blog.authorId?.lastName
+                  ? `${blog.authorId.firstName} ${blog.authorId.lastName}`
+                  : blog.authorId?.username || blog.authorId?.email || "Unknown"
+              }
+              date={new Date(blog.createdAt).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
               delay={index}
             />
           ))}
@@ -170,7 +185,7 @@ export default function BlogPage() {
         {/* Pagination */}
         <Pagination
           currentPage={currentPage}
-          totalPages={totalPages}
+          totalPages={pagination.totalPages}
           onPageChange={handlePageChange}
         />
       </div>

@@ -1,12 +1,12 @@
-import JobDetailPage from '@/page-files/JobDetailPage'
-import React from 'react'
+import JobDetailPage from "@/page-files/JobDetailPage";
+import React from "react";
 
-const page = ({ params }: { params: { id: string } }) => {
+const page = () => {
   return (
     <div>
-      <JobDetailPage params={params} />
+      <JobDetailPage />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

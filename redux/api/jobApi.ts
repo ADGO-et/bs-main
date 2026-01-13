@@ -1,13 +1,23 @@
-import { creatingTalentPayload } from "@/types/jobApi";
+import {
+  creatingTalentPayload,
+  SingleTalentResponse,
+  TalentResponse,
+} from "@/types/jobApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_BASE_URL } from "./baseUrl";
 
 export const jobApi = createApi({
   reducerPath: "jobApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et:5002",
+    baseUrl: API_BASE_URL,
     // credentials: "include",
-    prepareHeaders: (headers) => {
-      headers.set("Content-Type", `application/json`);
+    prepareHeaders: (headers, { getState }) => {
+      headers.set("Content-Type", "application/json");
+      // Get token from Redux state
+      const token = (getState() as any).auth.accessToken;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
       return headers;
     },
   }),
@@ -23,16 +33,27 @@ export const jobApi = createApi({
       }),
     }),
 
-    //  get all talents
-    getAllTalents: builder.query<any, void>({
-      query: () => ({
-        url: "/talent",
-        method: "GET",
-      }),
+    // get all talents with pagination and filters
+    getAllTalents: builder.query<
+      TalentResponse,
+      { page?: number; limit?: number; category?: string; period?: string }
+    >({
+      query: ({ page = 1, limit = 10, category, period } = {}) => {
+        const params = new URLSearchParams();
+        params.append("page", page.toString());
+        params.append("limit", limit.toString());
+        if (category) params.append("category", category);
+        if (period) params.append("period", period);
+
+        return {
+          url: `/talent?${params.toString()}`,
+          method: "GET",
+        };
+      },
     }),
 
     // get a specific talent by id (Admin only)
-    getSingleTalent: builder.query<any, string>({
+    getSingleTalent: builder.query<SingleTalentResponse, string>({
       query: (id) => ({
         url: `/talent/${id}`,
         method: "GET",

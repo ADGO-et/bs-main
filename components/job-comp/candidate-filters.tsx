@@ -29,15 +29,8 @@ interface CandidateFiltersProps {
 }
 
 export default function CandidateFilters({
-  employmentTypes,
-  departments,
   fields,
-  selectedEmploymentTypes,
-  selectedDepartments,
   selectedFields,
-  selectedLocations,
-  onEmploymentTypeChange,
-  onDepartmentChange,
   onFieldChange,
   onApplyFilters,
   onClearFilters,
@@ -196,7 +189,7 @@ export default function CandidateFilters({
       {/* Filter Action Buttons */}
       <div className="flex gap-3">
         <Button
-          className="flex-1 bg-purple-500 hover:bg-purple-600 text-white"
+          className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
           onClick={onApplyFilters}
         >
           Apply Filters

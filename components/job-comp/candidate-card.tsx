@@ -14,7 +14,11 @@ type CandidateCardProps = {
   layout: "list" | "grid";
 };
 
-export default function CandidateCard({ candidate, index, layout }: CandidateCardProps) {
+export default function CandidateCard({
+  candidate,
+  index,
+  layout,
+}: CandidateCardProps) {
   const router = useRouter();
 
   const handleSeeMore = () => {
@@ -28,9 +32,9 @@ export default function CandidateCard({ candidate, index, layout }: CandidateCar
       case "parttime":
         return "text-blue-500 bg-blue-50";
       case "remote":
-        return "text-purple-500 bg-purple-50";
+        return "text-blue-500 bg-blue-50";
       case "internship":
-        return "text-purple-500 bg-purple-50";
+        return "text-blue-500 bg-blue-50";
       case "contract":
         return "text-gray-500 bg-gray-50";
       default:
@@ -57,9 +61,7 @@ export default function CandidateCard({ candidate, index, layout }: CandidateCar
           </div>
           <div>
             <h3 className="font-medium">{`${candidate.name}`}</h3>
-            <p className="text-sm text-gray-500">
-              {candidate.skills}
-            </p>
+            <p className="text-sm text-gray-500">{candidate.skills}</p>
             <div className="flex items-center text-xs text-gray-500 mt-1">
               <MapPin size={12} className="mr-1" />
               <span>{candidate.location}</span>
@@ -78,7 +80,7 @@ export default function CandidateCard({ candidate, index, layout }: CandidateCar
         </div>
         <Button
           variant="outline"
-          className="text-purple-500 border-purple-500 hover:bg-purple-50 w-full sm:w-auto"
+          className="text-blue-500 border-blue-500 hover:bg-blue-50 w-full sm:w-auto"
           onClick={handleSeeMore}
         >
           See More
@@ -123,7 +125,7 @@ export default function CandidateCard({ candidate, index, layout }: CandidateCar
       </div>
       <Button
         variant="outline"
-        className="text-purple-500 border-purple-500 hover:bg-purple-50 mt-auto"
+        className="text-blue-500 border-blue-500 hover:bg-blue-50 mt-auto"
         onClick={handleSeeMore}
       >
         See More

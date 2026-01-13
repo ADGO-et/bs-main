@@ -1,12 +1,19 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { BlogListResponse, Blog, BlogResponse } from "@/types/blogApi";
+import { API_BASE_URL } from "./baseUrl";
 
 export const blogApi = createApi({
   reducerPath: "blogApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et:5002",
+    baseUrl: API_BASE_URL,
     // credentials: "include",
-    prepareHeaders: (headers) => {
-      headers.set("Content-Type", `application/json`);
+    prepareHeaders: (headers, { getState }) => {
+      headers.set("Content-Type", "application/json");
+      // Get token from Redux state
+      const token = (getState() as any).auth.accessToken;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
       return headers;
     },
   }),
@@ -14,7 +21,8 @@ export const blogApi = createApi({
   tagTypes: [],
   endpoints: (builder) => ({
     //  get all blogs
-    getAllBlogs: builder.query<any, void>({
+    //  get all blogs
+    getAllBlogs: builder.query<BlogListResponse, void>({
       query: () => ({
         url: "/blogs",
         method: "GET",
@@ -22,7 +30,7 @@ export const blogApi = createApi({
     }),
 
     // get blog by id
-    getBlogById: builder.query<any, string>({
+    getBlogById: builder.query<BlogResponse, string>({
       query: (id) => ({
         url: `/blogs/${id}`,
         method: "GET",

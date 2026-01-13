@@ -1,12 +1,12 @@
-import React from 'react'
-import HiwotDetailPage from '@/page-files/HiwotDetailPage'
+import React from "react";
+import HiwotDetailPage from "@/page-files/HiwotDetailPage";
 
-const page = ({ params }: { params: { id: string } }) => {
+const page = () => {
   return (
     <div>
-      <HiwotDetailPage params={params} />
+      <HiwotDetailPage />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

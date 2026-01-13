@@ -1,41 +1,92 @@
-import { StaticImageData } from "next/image";
+// import { StaticImageData } from "next/image";
 
 export interface creatingTalentPayload {
     firstName: string;
     lastName: string;
-    email: string;
-    phoneNumber: string;
-    location: string;
-    skills: string[];
-    experience: number;
-    resume: File | null; 
-    coverLetter: File | null; 
+    profession: string;
+    addressLine: string;
+    category: string;
+    description: string;
+    email?: string;
+    phone?: string;
+    location?: string;
+    skills?: string[];
+    experience?: {
+      title?: string;
+      company?: string;
+      startDate?: string;
+      endDate?: string;
+      description?: string
+    }[];
+    education?:{
+      degree?: string;
+      institution: string;
+      startDate?: string;
+      endDate?: string;
+    }[]
+    educationalFiles?: string[];
+    profilePic?: string;
+    period?: 'fullTime' | 'partTime';
+    videoLink?: string;
+    isAvailable?: boolean;
 }
 
 
-export interface Candidate {
-    id: string;
+export interface SingleTalent {
+    _id: string;
     firstName: string;
     lastName: string;
-    department: string;
-    field: string;
-    phoneNumber: string;
+    profession: string;
+    phone: string;
     email: string;
     location: string;
-    address: string;
-    bank: string;
-    bankAccount: string;
-    educationCertificates: string[];
-    CV: string;
-    identification: string;
-    photo: StaticImageData;
-    typeOfEmployment: string;
+    addressLine: string;
+    category: string;
+    description: string;
+    skills: string[];
+    experience: {
+      title: string;
+      company: string;
+      startDate: string;
+      endDate: string;
+      description: string;
+      _id: string;
+    }[];
+    education: {
+      degree: string;
+      institution: string;
+      startDate: string;
+      endDate: string;
+      _id: string;
+    }[];
+    educationalFiles: string[];
+    profilePic: string;
+    period: 'fullTime' | 'partTime';
     videoLink: string;
+    isAvailable: boolean;
+    status: string;
+    feedback: string | null;
+    createdAt: string;
+    updatedAt: string;
 }
 
 
-export interface CandidateCardProps {
-  candidate: Candidate;
-  index: number;
-  layout: "list" | "grid";
+export interface SingleTalentResponse {
+  status: string;
+  message: string;
+  data: SingleTalent;
+}
+
+export interface TalentResponse {
+  status: string;
+  message: string;
+  data: {
+    talents: SingleTalent[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  };
 }

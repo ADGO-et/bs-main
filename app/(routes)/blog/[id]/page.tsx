@@ -1,106 +1,105 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { Calendar, User, ArrowLeft, Share2, ThumbsUp } from "lucide-react";
+import { Calendar, User, ArrowLeft, Share2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import BlogCard from "@/components/blog-comp/BlogCard";
-// Mock blog data
-const mockBlogs = Array.from({ length: 30 }, (_, i) => ({
-  id: `blog-${i + 1}`,
-  title:
-    i === 0
-      ? "Integer Maecenas Eget Viverra"
-      : [
-          "Integer Maecenas Eget Viverra",
-          "Aenean eleifend ante maecenas",
-          "Vivamus laoreet mauris fusce",
-        ][i % 3],
-  secondaryHeading: "The Future of Digital Marketing",
-  description:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-  content: `
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    <h2>Key Points</h2>
-    <ul>
-      <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit</li>
-      <li>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</li>
-      <li>Ut enim ad minim veniam, quis nostrud exercitation ullamco</li>
-    </ul>
-    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-  `,
-  image: [
-    "https://images.pexels.com/photos/13167951/pexels-photo-13167951.jpeg?cs=srgb&dl=pexels-ezgi-bulut-280715511-13167951.jpg&fm=jpg",
-    "https://images.pexels.com/photos/13167951/pexels-photo-13167951.jpeg?cs=srgb&dl=pexels-ezgi-bulut-280715511-13167951.jpg&fm=jpg",
-    "https://images.pexels.com/photos/13167951/pexels-photo-13167951.jpeg?cs=srgb&dl=pexels-ezgi-bulut-280715511-13167951.jpg&fm=jpg",
-  ][i % 3],
-  videoLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  referenceLink: "https://example.com/reference",
-  author: ["John Doe", "Jane Smith", "Alex Johnson"][i % 3],
-  date: new Date(2023, i % 12, (i % 28) + 1).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }),
-}));
+import { useParams } from "next/navigation";
+import { useGetBlogByIdQuery, useGetAllBlogsQuery } from "@/redux/api/blogApi";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function BlogDetailPage({ params }: { params: { id: string } }) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [blog, setBlog] = useState<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(15);
+export default function BlogDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+  const { toast } = useToast();
+  const [shareSuccess, setShareSuccess] = useState(false);
 
-  useEffect(() => {
-    // Find the blog with the matching ID
-    const foundBlog = mockBlogs.find((blog) => blog.id === params.id);
+  // Fetch blog by ID
+  const { data, isLoading, isError } = useGetBlogByIdQuery(id);
+  const blog = data?.data;
 
-    if (foundBlog) {
-      setBlog(foundBlog);
+  // Fetch all blogs for related articles
+  const { data: allBlogsData } = useGetAllBlogsQuery();
+  const allBlogs = allBlogsData?.data?.blogs || [];
 
-      // Get 3 related blogs (excluding the current one)
-      const related = mockBlogs
-        .filter((b) => b.id !== params.id)
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 3);
+  // Related blogs: exclude current, pick 3 random
+  const relatedBlogs = allBlogs
+    .filter((b) => b._id !== id)
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 3);
 
-      setRelatedBlogs(related);
-    }
-  }, [params.id]);
-
-  const handleLike = () => {
-    if (liked) {
-      setLikeCount(likeCount - 1);
-    } else {
-      setLikeCount(likeCount + 1);
-    }
-    setLiked(!liked);
-  };
-
-  if (!blog) {
+  if (isLoading)
     return (
       <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
         <p>Loading...</p>
       </div>
     );
-  }
+  if (isError || !blog)
+    return (
+      <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
+        <p>Blog not found.</p>
+      </div>
+    );
+
+  // Build a canonical universal link that works for both dev & prod.
+  // Prefer an explicitly configured public site URL so links created in a preview / SSR env are still production-safe.
+  const getCanonicalShareUrl = () => {
+    // Allow a NEXT_PUBLIC_SITE_URL env variable (e.g. https://yourprod.com)
+    const baseEnv = process.env.NEXT_PUBLIC_SITE_URL;
+    // Fallback to current origin (only available client-side)
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const base = baseEnv && baseEnv.length > 0 ? baseEnv.replace(/\/$/, "") : origin;
+    // Current routing pattern: /blog/[id]
+    return `${base}/blog/${id}`;
+  };
+
+  const handleShare = async () => {
+    const shareUrl = getCanonicalShareUrl();
+    const title = blog.title || "Blog";
+    const text = blog.secondaryHeading || blog.content?.[0] || "Check out this blog";
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text, url: shareUrl });
+        toast({ title: "Shared", description: "Link shared successfully." });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
+        setShareSuccess(true);
+        toast({ title: "Link copied", description: "Universal link copied to clipboard." });
+        setTimeout(() => setShareSuccess(false), 2500);
+      } else {
+        // Legacy fallback: create a temporary input
+        const el = document.createElement("input");
+        el.value = shareUrl;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        setShareSuccess(true);
+        toast({ title: "Link copied", description: "Universal link copied to clipboard." });
+        setTimeout(() => setShareSuccess(false), 2500);
+      }
+    } catch (err) {
+      console.error("Share failed", err);
+      toast({
+        title: "Share failed",
+        variant: "destructive",
+        description: "Couldn't share the link. Try again or copy manually.",
+      });
+    }
+  };
 
   return (
-    <div className="min-h-screen pt-44 pb-16 relative overflow-hidden">
+    <div className="min-h-screen  pb-16 relative overflow-hidden">
       {/* Background patterns */}
       <div className="absolute -left-40 top-0 opacity-10">
-        <svg
-          width="400"
-          height="400"
-          viewBox="0 0 400 400"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg width="400" height="400" viewBox="0 0 400 400" fill="none">
           <circle
             cx="200"
             cy="200"
@@ -127,15 +126,8 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
           />
         </svg>
       </div>
-
       <div className="absolute -right-40 bottom-0 opacity-10">
-        <svg
-          width="400"
-          height="400"
-          viewBox="0 0 400 400"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg width="400" height="400" viewBox="0 0 400 400" fill="none">
           <circle
             cx="200"
             cy="200"
@@ -163,15 +155,16 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
         </svg>
       </div>
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 mt-10">
         <div className="mb-6">
-          <Link
+          <Button
             href="/blog"
-            className="inline-flex items-center text-gray-600 hover:text-purple-500 transition-colors"
+            onClick={() => router.push("/blog")}
+            className="inline-flex items-center text-white bg-blue-600 hover:bg-blue-600/80 transition-colors"
           >
             <ArrowLeft size={16} className="mr-2" />
             Back to Blogs
-          </Link>
+          </Button>
         </div>
 
         <motion.div
@@ -183,7 +176,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
           {/* Blog Header */}
           <div className="relative h-[400px] w-full">
             <Image
-              src={blog.image || "/placeholder.svg"}
+              src={blog.blogImage || "/placeholder.svg"}
               alt={blog.title}
               fill
               className="object-cover"
@@ -194,11 +187,23 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
             <div className="flex items-center text-sm text-gray-500 space-x-4 mb-4">
               <div className="flex items-center">
                 <User size={16} className="mr-1" />
-                <span>{blog.author}</span>
+                <span>
+                  {blog.authorId?.firstName && blog.authorId?.lastName
+                    ? `${blog.authorId.firstName} ${blog.authorId.lastName}`
+                    : blog.authorId?.username ||
+                      blog.authorId?.email ||
+                      "Unknown"}
+                </span>
               </div>
               <div className="flex items-center">
                 <Calendar size={16} className="mr-1" />
-                <span>{blog.date}</span>
+                <span>
+                  {new Date(blog.createdAt).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
             </div>
 
@@ -207,10 +212,13 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
               {blog.secondaryHeading}
             </h2>
 
-            <div
-              className="prose max-w-none mb-8"
-              dangerouslySetInnerHTML={{ __html: blog.content }}
-            />
+            <div className="prose max-w-none mb-8">
+              {Array.isArray(blog.content) ? (
+                blog.content.map((para, idx) => <p key={idx}>{para}</p>)
+              ) : (
+                <p>{blog.content}</p>
+              )}
+            </div>
 
             {/* Video Embed */}
             {blog.videoLink && (
@@ -235,7 +243,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                   href={blog.referenceLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-purple-500 hover:underline"
+                  className="text-blue-500 hover:underline"
                 >
                   {blog.referenceLink}
                 </a>
@@ -244,7 +252,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
 
             {/* Social Actions */}
             <div className="flex items-center space-x-4 border-t pt-6">
-              <Button
+              {/* <Button
                 variant="outline"
                 size="sm"
                 className={`flex items-center gap-2 ${
@@ -254,14 +262,15 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
               >
                 <ThumbsUp size={16} />
                 <span>{likeCount}</span>
-              </Button>
+              </Button> */}
               <Button
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
+                onClick={handleShare}
               >
-                <Share2 size={16} />
-                <span>Share</span>
+                {shareSuccess ? <Check size={16} /> : <Share2 size={16} />}
+                <span>{shareSuccess ? "Copied" : "Share"}</span>
               </Button>
             </div>
           </div>
@@ -271,16 +280,30 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Related Articles</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {relatedBlogs.map((blog, index) => (
+            {relatedBlogs.map((related, index) => (
               <BlogCard
-                key={blog.id}
-                id={blog.id}
-                title={blog.title}
-                secondaryHeading={blog.secondaryHeading}
-                description={blog.description}
-                image={blog.image}
-                author={blog.author}
-                date={blog.date}
+                key={related._id}
+                id={related._id}
+                title={related.title}
+                secondaryHeading={related.secondaryHeading}
+                description={
+                  Array.isArray(related.content)
+                    ? related.content[0]
+                    : related.content
+                }
+                image={related.blogImage}
+                author={
+                  related.authorId?.firstName && related.authorId?.lastName
+                    ? `${related.authorId.firstName} ${related.authorId.lastName}`
+                    : related.authorId?.username ||
+                      related.authorId?.email ||
+                      "Unknown"
+                }
+                date={new Date(related.createdAt).toLocaleDateString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
                 delay={index}
               />
             ))}

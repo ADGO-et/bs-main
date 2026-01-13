@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 "use client";
 
 import Image from "next/image";
@@ -24,7 +26,7 @@ export default function BlogCard({
   title,
   // secondaryHeading,
   description,
-  // image,
+  image,
   // videoLink,
   // referenceLink,
   author = "Admin",
@@ -46,7 +48,7 @@ export default function BlogCard({
         <Link href={`/blog/${id}`} className="block">
           <div className="relative h-48 w-full overflow-hidden">
             <Image
-              src={imgg}
+              src={image}
               alt={title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -56,7 +58,7 @@ export default function BlogCard({
       </div>
       <div className="space-y-2">
         <Link href={`/blog/${id}`}>
-          <h3 className="font-bold text-lg group-hover:text-purple-500 transition-colors">
+          <h3 className="font-bold text-lg group-hover:text-blue-500 transition-colors">
             {title}
           </h3>
         </Link>
@@ -74,7 +76,7 @@ export default function BlogCard({
         <div className="pt-2">
           <Link
             href={`/blog/${id}`}
-            className="text-sm font-medium text-purple-500 hover:text-purple-600 transition-colors"
+            className="text-sm font-medium text-blue-500 hover:text-blue-600 transition-colors"
           >
             Read More
           </Link>

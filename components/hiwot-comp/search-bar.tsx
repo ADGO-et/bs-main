@@ -48,7 +48,7 @@ export default function SearchBar({
           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
           size={20}
         />
-        <Select value={location} onValueChange={onLocationChange}>
+        <Select value={location || "all"} onValueChange={onLocationChange}>
           <SelectTrigger className="pl-10">
             <SelectValue placeholder="Select location" />
           </SelectTrigger>
@@ -63,7 +63,7 @@ export default function SearchBar({
         </Select>
       </div>
       <Button
-        className="bg-purple-500 hover:bg-purple-600 text-white"
+        className="bg-blue-500 hover:bg-blue-600 text-white"
         onClick={onSearch}
       >
         Search

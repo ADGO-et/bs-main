@@ -1,13 +1,12 @@
-import React from 'react'
-import StartupDetailPage from '@/page-files/StartupDetailPage'
+import React from "react";
+import StartupDetailPage from "@/page-files/StartupDetailPage";
 
-const page = ({ params }: { params: { id: string } }) => {
-  console.log('Dynamic route params.id:', params.id);
+const page = () => {
   return (
     <div>
-      <StartupDetailPage params={params} />
+      <StartupDetailPage />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

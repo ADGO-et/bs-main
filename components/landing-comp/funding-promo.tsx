@@ -14,7 +14,7 @@ export default function FundingPromo() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* First promo section */}
           <motion.div
-            className="relative bg-gradient-to-r from-purple-500 to-purple-700 rounded-lg overflow-hidden"
+            className="relative bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg overflow-hidden"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -30,7 +30,7 @@ export default function FundingPromo() {
                 <p className="text-white/90 mb-6">
                   Start funding startups for only $10.
                 </p>
-                <Button className=" bg-white hover:bg-purple-600 text-black">
+                <Button className=" bg-white hover:bg-blue-600 text-black">
                   Sign Up For Free
                 </Button>
               </div>
@@ -107,7 +107,7 @@ export default function FundingPromo() {
                 </p>
                 <Button
                   asChild
-                  className="bg-purple-500 hover:bg-purple-600 text-white"
+                  className="bg-blue-500 hover:bg-blue-600 text-white"
                 >
                   <Link href="/startup">Learn more</Link>
                 </Button>

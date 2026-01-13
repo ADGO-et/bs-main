@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Twitter, Facebook, Instagram, Youtube } from "lucide-react";
+import logo from "@/public/logo/logo.png";
 
 export default function Footer() {
   return (
@@ -55,35 +57,22 @@ export default function Footer() {
               <h2 className="text-2xl font-bold">Bole Starter</h2>
             </Link>
             <p className="text-sm text-gray-400">
-              &quot;Lorem ipsum dolor sit amet, consectetur adipiscing
-              elit.&quot;
+              &quot;Turning visions into reality.&quot;
             </p>
             <div className="flex space-x-4 pt-4">
-              <Link
-                href="#"
-                className="hover:text-purple-400 transition-colors"
-              >
+              <Link href="#" className="hover:text-blue-400 transition-colors">
                 <Twitter className="h-5 w-5" />
                 <span className="sr-only">Twitter</span>
               </Link>
-              <Link
-                href="#"
-                className="hover:text-purple-400 transition-colors"
-              >
+              <Link href="#" className="hover:text-blue-400 transition-colors">
                 <Facebook className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </Link>
-              <Link
-                href="#"
-                className="hover:text-purple-400 transition-colors"
-              >
+              <Link href="#" className="hover:text-blue-400 transition-colors">
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
               </Link>
-              <Link
-                href="#"
-                className="hover:text-purple-400 transition-colors"
-              >
+              <Link href="#" className="hover:text-blue-400 transition-colors">
                 <Youtube className="h-5 w-5" />
                 <span className="sr-only">YouTube</span>
               </Link>
@@ -95,7 +84,15 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/mission"
+                  href="/about"
+                  className="text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about"
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Mission
@@ -103,7 +100,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/vision"
+                  href="/about"
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Vision
@@ -111,7 +108,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/values"
+                  href="/about"
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Values
@@ -153,14 +150,22 @@ export default function Footer() {
           <div>
             <h3 className="font-medium mb-4">Contact Us</h3>
             <ul className="space-y-2">
-              <li className="text-sm text-gray-400">info@bole-starter.com</li>
-              <li className="text-sm text-gray-400">+251 91 111 1111</li>
+              <li className="text-sm text-gray-400">info@bolestarter.com</li>
+              <li className="text-sm text-gray-400">+251-911-266-116</li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-gray-800 text-sm text-gray-400">
-          <p>© Bole Starter, 2024 All rights Reserved</p>
+        <div className="mt-12 pt-6 border-t border-gray-800 text-sm text-gray-400 flex items-center justify-between gap-4">
+          <p className="shrink-0">© Bole Starter, 2026 All rights Reserved</p>
+          <div className="ml-auto flex items-center">
+            <Image
+              src={logo}
+              alt="Bole Starter Logo"
+              className="w-auto h-14 object-contain"
+              priority
+            />
+          </div>
         </div>
       </div>
     </footer>

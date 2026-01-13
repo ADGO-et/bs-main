@@ -63,7 +63,7 @@ export default function SearchBar({
         </Select>
       </div>
       <Button
-        className="bg-purple-500 hover:bg-purple-600 text-white"
+        className="bg-blue-500 hover:bg-blue-600 text-white"
         onClick={onSearch}
       >
         Search

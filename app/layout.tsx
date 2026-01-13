@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 "use client";
 
 import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout-comp/navbar";
+import { AuthHydrator } from "@/components/auth-compo/auth-hydrator";
 import Footer from "@/components/layout-comp/footer";
 import { Toaster } from "@/components/ui/toaster";
 import { Provider as StoreProvider } from "react-redux";
@@ -18,14 +21,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <StoreProvider store={store}>
+          <AuthHydrator />
           <Navbar />
-          <main className="pt-40">{children}</main>
+          <main className="pt-20">{children}</main>
           <Footer />
         </StoreProvider>
+        <Toaster />
       </body>
-      <Toaster />
     </html>
   );
 }

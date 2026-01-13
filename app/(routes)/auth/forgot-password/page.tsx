@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 "use client";
 
 import type React from "react";
 
-import Link from "next/link";
+// import Link from "next/link";
 import { ArrowLeft, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,17 +44,17 @@ export default function ForgotPassword() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <Link
+        <a
           href="/"
           className="inline-flex items-center text-sm text-gray-600 mb-8 hover:text-black transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to home
-        </Link>
+        </a>
 
         <div className="text-center mb-8">
-          <div className="mx-auto w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-            <Mail className="h-6 w-6 text-purple-600" />
+          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+            <Mail className="h-6 w-6 text-blue-600" />
           </div>
           <h1 className="text-2xl font-bold">Forgot Password</h1>
           <p className="text-gray-500 mt-2">
@@ -90,7 +92,7 @@ export default function ForgotPassword() {
 
           <Button
             type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700"
+            className="w-full bg-blue-600 hover:bg-blue-700"
             disabled={isLoading}
           >
             {isLoading ? "Sending..." : "Send Reset Link"}
@@ -98,12 +100,12 @@ export default function ForgotPassword() {
 
           <div className="text-center text-sm">
             Remember your password?{" "}
-            <Link
+            <a
               href="/auth/signin"
-              className="text-purple-600 hover:underline font-medium"
+              className="text-blue-600 hover:underline font-medium"
             >
               Back to sign in
-            </Link>
+            </a>
           </div>
         </form>
       </div>

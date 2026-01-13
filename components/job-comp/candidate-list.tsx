@@ -92,7 +92,7 @@ export default function CandidateList({
             <Button
               variant="outline"
               size="icon"
-              className={`h-8 w-8 ${layout === "grid" ? "bg-purple-50" : ""}`}
+              className={`h-8 w-8 ${layout === "grid" ? "bg-blue-50" : ""}`}
               onClick={() => onLayoutChange("grid")}
             >
               <svg
@@ -115,7 +115,7 @@ export default function CandidateList({
             <Button
               variant="outline"
               size="icon"
-              className={`h-8 w-8 ${layout === "list" ? "bg-purple-50" : ""}`}
+              className={`h-8 w-8 ${layout === "list" ? "bg-blue-50" : ""}`}
               onClick={() => onLayoutChange("list")}
             >
               <svg
@@ -138,7 +138,7 @@ export default function CandidateList({
               </svg>
             </Button>
           </div>
-          <Button className="bg-purple-500 hover:bg-purple-600 text-white w-full sm:w-auto">
+          <Button className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto">
             Create Project
           </Button>
         </div>
