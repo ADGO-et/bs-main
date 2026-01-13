@@ -1,12 +1,14 @@
-import React from 'react'
-import HiwotOverviewPage from '@/page-files/HiwotOverviewPage'
+import React from "react";
+import HiwotOverviewPage from "@/page-files/HiwotOverviewPage";
+// import HiwotComingSoonPage from '@/page-files/HiwotComingSoonPage'
 
 const page = () => {
   return (
     <div>
-      <HiwotOverviewPage/>
+      <HiwotOverviewPage />
+      {/* <HiwotComingSoonPage/> */}
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

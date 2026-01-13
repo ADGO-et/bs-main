@@ -1,9 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_BASE_URL } from "./baseUrl";
 
 export const contactusApi = createApi({
   reducerPath: "contactusApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bole.weytech.et:5002",
+    baseUrl: API_BASE_URL,
     // credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);

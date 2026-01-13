@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import contactimgg from "@/public/contact.svg";
+import contactimgg from "@/public/contact.png";
 
 export default function ContactusPage() {
   const { toast } = useToast();
@@ -46,7 +46,7 @@ export default function ContactusPage() {
   };
 
   return (
-    <div className="min-h-screen pt-0 pb-16 relative overflow-hidden">
+    <div className="min-h-screen pt-0 pb-16 relative overflow-hidden md:w-[70vw] mx-auto mt-10">
       {/* Background patterns */}
       <div className="absolute -left-40 top-0 opacity-10">
         <svg
@@ -227,7 +227,7 @@ export default function ContactusPage() {
                   <MapPin className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-gray-600">545 Mavis Island, IL 59191</p>
+                  <p className="text-gray-600">Asmara Rd, Addis Ababa</p>
                 </div>
               </div>
 
@@ -236,7 +236,7 @@ export default function ContactusPage() {
                   <Phone className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-gray-600">+2034 4040 3030</p>
+                  <p className="text-gray-600">+251-911-266-116</p>
                 </div>
               </div>
 
@@ -245,7 +245,7 @@ export default function ContactusPage() {
                   <Mail className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-gray-600">hello@gmail.com</p>
+                  <p className="text-gray-600">info@bolestarter.com</p>
                 </div>
               </div>
             </div>

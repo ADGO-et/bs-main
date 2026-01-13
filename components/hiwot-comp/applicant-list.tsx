@@ -1,19 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import ApplicantCard, { type HiwotApplicant } from "./applicant-card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { use, useState } from "react";
+import ApplicantCard from "./applicant-card";
 import { Button } from "@/components/ui/button";
 import Pagination from "@/components/common-comp/pagination";
+import type { HiwotFund } from "@/types/hiwotApi";
+import { useRouter } from "next/navigation";
 
 interface ApplicantListProps {
-  applicants: HiwotApplicant[];
+  applicants: HiwotFund[];
   layout: "list" | "grid";
   onLayoutChange: (layout: "list" | "grid") => void;
 }
@@ -39,15 +34,15 @@ export default function ApplicantList({
           `${a.firstName} ${a.lastName}`
         );
       case "funding-high":
-        return Number.parseInt(b.goalFund) - Number.parseInt(a.goalFund);
+        return b.fundingGoal - a.fundingGoal;
       case "funding-low":
-        return Number.parseInt(a.goalFund) - Number.parseInt(b.goalFund);
-      case "progress-high":
-        return (b.fundingProgress || 0) - (a.fundingProgress || 0);
-      case "progress-low":
-        return (a.fundingProgress || 0) - (b.fundingProgress || 0);
+        return a.fundingGoal - b.fundingGoal;
       default:
-        return 0;
+        // Most recent (assuming createdAt exists)
+        return (
+          new Date(b.createdAt ?? 0).getTime() -
+          new Date(a.createdAt ?? 0).getTime()
+        );
     }
   });
 
@@ -63,12 +58,13 @@ export default function ApplicantList({
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+  const router = useRouter();
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h2 className="text-xl font-bold">All Applicants</h2>
+          <h2 className="text-xl font-bold">All Hiwot Funds</h2>
           <p className="text-sm text-gray-500">
             Showing {sortedApplicants.length} results
           </p>
@@ -78,28 +74,17 @@ export default function ApplicantList({
             <span className="text-sm text-gray-500 whitespace-nowrap">
               Sort by:
             </span>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="most-recent">Most recent</SelectItem>
-                <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                <SelectItem value="funding-high">
-                  Funding Goal (High-Low)
-                </SelectItem>
-                <SelectItem value="funding-low">
-                  Funding Goal (Low-High)
-                </SelectItem>
-                <SelectItem value="progress-high">
-                  Progress (High-Low)
-                </SelectItem>
-                <SelectItem value="progress-low">
-                  Progress (Low-High)
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <select
+              className="border rounded px-2 py-1"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="most-recent">Most recent</option>
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="name-desc">Name (Z-A)</option>
+              <option value="funding-high">Funding Goal (High-Low)</option>
+              <option value="funding-low">Funding Goal (Low-High)</option>
+            </select>
           </div>
           <div className="flex gap-2">
             <Button
@@ -108,6 +93,7 @@ export default function ApplicantList({
               className={`h-8 w-8 ${layout === "grid" ? "bg-blue-50" : ""}`}
               onClick={() => onLayoutChange("grid")}
             >
+              {/* grid icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -131,6 +117,7 @@ export default function ApplicantList({
               className={`h-8 w-8 ${layout === "list" ? "bg-blue-50" : ""}`}
               onClick={() => onLayoutChange("list")}
             >
+              {/* list icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -151,7 +138,10 @@ export default function ApplicantList({
               </svg>
             </Button>
           </div>
-          <Button className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto">
+          <Button
+            className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto"
+            onClick={() => router.push("/hiwot/add")}
+          >
             Apply for Fund
           </Button>
         </div>
@@ -163,7 +153,7 @@ export default function ApplicantList({
           {currentApplicants.length > 0 ? (
             currentApplicants.map((applicant, index) => (
               <ApplicantCard
-                key={applicant.id}
+                key={applicant._id}
                 applicant={applicant}
                 index={index}
                 layout="list"
@@ -171,9 +161,7 @@ export default function ApplicantList({
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500">
-                No applicants found matching your criteria.
-              </p>
+              <p className="text-gray-500">No hiwot funds found.</p>
             </div>
           )}
         </div>
@@ -182,7 +170,7 @@ export default function ApplicantList({
           {currentApplicants.length > 0 ? (
             currentApplicants.map((applicant, index) => (
               <ApplicantCard
-                key={applicant.id}
+                key={applicant._id}
                 applicant={applicant}
                 index={index}
                 layout="grid"
@@ -190,9 +178,7 @@ export default function ApplicantList({
             ))
           ) : (
             <div className="text-center py-8 col-span-full">
-              <p className="text-gray-500">
-                No applicants found matching your criteria.
-              </p>
+              <p className="text-gray-500">No hiwot funds found.</p>
             </div>
           )}
         </div>

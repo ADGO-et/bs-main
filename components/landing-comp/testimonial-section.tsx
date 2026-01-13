@@ -7,34 +7,34 @@ import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 const testimonials = [
   {
     id: 1,
-    name: "Sarah Johnson",
-    role: "Startup Founder, TechWave",
+    name: "Hana Getachew",
+    role: "Founder, Addis GreenTech",
     content:
-      "Bole Starter helped us secure funding within weeks. Their platform is intuitive and their support team is exceptional.",
+      "Bole Starter made it possible to secure early funding without complex red tape—it's a game-changer for Ethiopian startups.",
     rating: 5,
   },
   {
     id: 2,
-    name: "Michael Chen",
-    role: "Project Lead, GreenFuture",
+    name: "Samuel Tesfaye",
+    role: "Tech Entrepreneur, Mekelle",
     content:
-      "The flexibility of funding options is unmatched. We got exactly what our project needed without bureaucracy.",
+      "We connected with investors who truly believed in our vision—something that was nearly impossible before this platform",
     rating: 4,
   },
   {
     id: 3,
-    name: "Aisha Patel",
-    role: "CEO, HealthInnovate",
+    name: "Rahel Mulugeta",
+    role: "Startup Mentor & Ecosystem Builder",
     content:
-      "From application to disbursement, everything was transparent and fast. Highly recommend for African startups.",
+      "Finally, a funding platform built with local context in mind. It's fueling real innovation across Ethiopia.",
     rating: 5,
   },
   {
     id: 4,
-    name: "David Kim",
-    role: "CTO, AgroTech",
+    name: "Dr. Elias Mekuria",
+    role: "Policy Advisor, Ministry of Innovation & Technology",
     content:
-      "Their startup fund gave us the runway we needed to launch our MVP. Game-changing support!",
+      "This platform aligns perfectly with Ethiopia's digital transformation goals—smart, inclusive, and impact-driven.",
     rating: 5,
   },
 ];
@@ -92,8 +92,8 @@ export default function TestimonialCarousel() {
           className="text-center mb-12"
         >
           <p className="text-blue-600 max-w-2xl mx-auto">Testimonials</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            What Our Clients Say
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            What People Say about BoleStarter
           </h2>
         </motion.div>
 

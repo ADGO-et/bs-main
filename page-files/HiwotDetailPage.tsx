@@ -1,67 +1,134 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  useGetHiwotByIdQuery,
+  useGetHiwotCommentsQuery,
+  usePostHiwotCommentMutation,
+  useLikeOrDislikeHiwotMutation,
+} from "@/redux/api/hiwotApi";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import {
   ArrowLeft,
-  MapPin,
   Phone,
   Mail,
-  Calendar,
-  FileText,
-  Download,
-  ExternalLink,
+  CheckCircle,
   Heart,
+  ExternalLink,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
-import type { HiwotApplicant } from "@/components/hiwot-comp/applicant-card";
 import placeholderimg from "@/public/hiwot-placeholder.png";
-import { useRouter, useParams } from "next/navigation";
-import { mockApplicants } from "@/components/hiwot-comp/mockApplicants";
+import { useSelector } from "react-redux";
+import { useGetUserByIdQuery } from "@/redux/api/userApi";
+import { PaymentDialog } from "./Dialog-files/PaymentDialog";
 
 export default function HiwotDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id =
     typeof params.id === "string"
       ? params.id
       : Array.isArray(params.id)
       ? params.id[0]
       : undefined;
-  const [applicant, setApplicant] = useState<HiwotApplicant | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  const {
+    data: response,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetHiwotByIdQuery(id ?? "", { skip: !id });
+  const hiwot = response?.data.hiwot;
+  console.log("hiw", hiwot);
+  const getDaysToGo = (expiryDate: string | undefined) => {
+    if (!expiryDate) return 0;
+    const now = new Date();
+    const expiry = new Date(expiryDate);
+    const diff = expiry.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return days > 0 ? days : 0;
+  };
+
+  const daysToGo = getDaysToGo(hiwot?.postExpiryDate);
+
+  const userId = useSelector((state: any) => state.auth?.user?.id);
+  const { data: user, refetch: refetchUser } = useGetUserByIdQuery(userId);
+
+  // Comments
+  const {
+    data: commentsData,
+    isLoading: commentsLoading,
+    isError: commentsError,
+    refetch: refetchComments,
+  } = useGetHiwotCommentsQuery(id, { skip: !id });
+  const [postComment, { isLoading: postingComment }] =
+    usePostHiwotCommentMutation();
+  const comments = Array.isArray(commentsData?.data) ? commentsData.data : [];
+
+  // Like
+  const [likeOrDislikeHiwot, { isLoading: likeLoading }] =
+    useLikeOrDislikeHiwotMutation();
+  const serverLikesCount = response?.data.likesCount || 0;
+  const [isLiked, setIsLiked] = useState(false);
+  const [localLikesCount, setLocalLikesCount] =
+    useState<number>(serverLikesCount);
 
   useEffect(() => {
-    setLoading(true);
-    const found = mockApplicants.find((a) => a.id === id);
-    setApplicant(found || null);
-    setLoading(false);
-  }, [id]);
+    if (!hiwot) return;
+    // If your user object has likedHiwots, check if this hiwot is liked
+    const likedHiwots: string[] = Array.isArray(user?.data)
+      ? user.data[0]?.author?.likedHiwots ?? []
+      : user?.data?.likedHiwots ?? [];
+    setIsLiked(Boolean(hiwot._id && likedHiwots.includes(hiwot._id)));
+    setLocalLikesCount(serverLikesCount);
+  }, [user, hiwot, serverLikesCount]);
+
+  const handleLike = async () => {
+    if (!id) return;
+    const prevLiked = isLiked;
+    setIsLiked(!prevLiked);
+    setLocalLikesCount((c) => (prevLiked ? Math.max(0, c - 1) : c + 1));
+    try {
+      await likeOrDislikeHiwot(id).unwrap();
+      await Promise.all([refetch(), refetchUser()]);
+    } catch (err) {
+      setIsLiked(prevLiked);
+      setLocalLikesCount((c) => (prevLiked ? c + 1 : Math.max(0, c - 1)));
+      // Optionally show error toast
+    }
+  };
+
+  const handleSupport = () => {
+    // Open payment dialog or redirect
+  };
+
+  // Comment
+  const [newComment, setNewComment] = useState("");
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+    try {
+      await postComment({
+        id,
+        content: newComment,
+        startup: hiwot?._id,
+      }).unwrap();
+      setNewComment("");
+      refetchComments();
+    } catch (error) {
+      // Optionally show error toast
+    }
+  };
 
   const handleBack = () => {
     router.push("/hiwot/overview");
   };
-  // Calculate age from date of birth
-  const calculateAge = (dateOfBirth: string) => {
-    const birthDate = new Date(dateOfBirth);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
 
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-
-    return age;
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen pt-0 pb-16 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -69,108 +136,32 @@ export default function HiwotDetailPage() {
     );
   }
 
-  if (!applicant) {
+  if (isError || !hiwot) {
     return (
       <div className="min-h-screen pt-0 pb-16 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Applicant Not Found</h2>
-          <p className="text-gray-600 mb-6">
-            The applicant you are looking for does not exist.
-          </p>
+          <h2 className="text-2xl font-bold mb-4">Hiwot Fund Not Found</h2>
           <Button
             onClick={handleBack}
             className="bg-blue-500 hover:bg-blue-600 text-white"
           >
-            <Link href="/hiwot">Back to Applicants</Link>
+            Back to Hiwot Funds
           </Button>
         </div>
       </div>
     );
   }
-  const router = useRouter();
-  const age = calculateAge(applicant.dateOfBirth);
 
   return (
     <div className="min-h-screen pt-0 pb-16 relative overflow-hidden">
-      {/* Background patterns */}
-      {/* <div className="absolute -left-40 top-0 opacity-10">
-        <svg
-          width="400"
-          height="400"
-          viewBox="0 0 400 400"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle
-            cx="200"
-            cy="200"
-            r="200"
-            stroke="#FFA500"
-            strokeWidth="0.5"
-            fill="none"
-          />
-          <circle
-            cx="200"
-            cy="200"
-            r="180"
-            stroke="#FFA500"
-            strokeWidth="0.5"
-            fill="none"
-          />
-          <circle
-            cx="200"
-            cy="200"
-            r="160"
-            stroke="#FFA500"
-            strokeWidth="0.5"
-            fill="none"
-          />
-        </svg>
-      </div>
-
-      <div className="absolute -right-40 bottom-0 opacity-10">
-        <svg
-          width="400"
-          height="400"
-          viewBox="0 0 400 400"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle
-            cx="200"
-            cy="200"
-            r="200"
-            stroke="#3B82F6"
-            strokeWidth="0.5"
-            fill="none"
-          />
-          <circle
-            cx="200"
-            cy="200"
-            r="180"
-            stroke="#3B82F6"
-            strokeWidth="0.5"
-            fill="none"
-          />
-          <circle
-            cx="200"
-            cy="200"
-            r="160"
-            stroke="#3B82F6"
-            strokeWidth="0.5"
-            fill="none"
-          />
-        </svg>
-      </div> */}
-
       <div className="container mx-auto px-4">
         <div className="mb-6 m-3">
           <Button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 "
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2"
             onClick={handleBack}
           >
             <ArrowLeft size={16} className="mr-2" />
-            Back to Applicants
+            Back to Hiwot Funds
           </Button>
         </div>
 
@@ -187,36 +178,27 @@ export default function HiwotDetailPage() {
                 <div className="relative h-32 w-32 rounded-full overflow-hidden mb-4">
                   <Image
                     src={placeholderimg}
-                    alt={`${applicant.firstName} ${applicant.lastName}`}
+                    alt={`${hiwot.firstName} ${hiwot.lastName}`}
                     fill
                     className="object-cover"
                   />
                 </div>
-                <h1 className="text-2xl font-bold">{`${applicant.firstName} ${applicant.lastName}`}</h1>
-                <p className="text-gray-600">{applicant.description}</p>
+                <h1 className="text-2xl font-bold">{`${hiwot.firstName} ${hiwot.lastName}`}</h1>
+                <p className="text-gray-600">{hiwot.description}</p>
                 <div className="mt-2">
                   <span className="inline-flex items-center text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-800">
-                    <Calendar size={12} className="mr-1" />
-                    {age} years old
+                    <CheckCircle size={12} className="mr-1" />
+                    {hiwot.status}
                   </span>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className="font-medium">Location</p>
-                    <p className="text-gray-600">{applicant.location}</p>
-                    <p className="text-sm text-gray-500">{applicant.address}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
                   <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
                   <div>
                     <p className="font-medium">Phone</p>
-                    <p className="text-gray-600">{applicant.phoneNumber}</p>
+                    <p className="text-gray-600">{hiwot.phoneNumber}</p>
                   </div>
                 </div>
 
@@ -224,15 +206,16 @@ export default function HiwotDetailPage() {
                   <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
                   <div>
                     <p className="font-medium">Email</p>
-                    <p className="text-gray-600">{applicant.email}</p>
+                    <p className="text-gray-600">{hiwot.email}</p>
                   </div>
                 </div>
-              </div>
-
-              <div className="mt-6 pt-6 border-t">
-                <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">
-                  Contact Applicant
-                </Button>
+                <div className="flex items-start gap-3">
+                  <span className="h-5 w-5 text-gray-500 mt-0.5">🌍</span>
+                  <div>
+                    <p className="font-medium">Country</p>
+                    <p className="text-gray-600">{hiwot.countryOfResidence}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -245,108 +228,41 @@ export default function HiwotDetailPage() {
             className="lg:col-span-2"
           >
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 pt-0">
-              <Tabs defaultValue="story">
-                <TabsList className="mb-6">
-                  <TabsTrigger value="story">Story</TabsTrigger>
-                  <TabsTrigger value="document"> Documents</TabsTrigger>
-                </TabsList>
+              <h2 className="text-xl font-bold mb-4">
+                {hiwot.firstName}'s Story
+              </h2>
+              <p className="text-gray-600 mb-6">{hiwot.description}</p>
+              <div className="space-y-6">
+                <h2 className="text-xl font-bold mb-4">Video Message</h2>
+                <div className="relative pt-[56.25%] bg-gray-100 rounded-lg overflow-hidden">
+                  <iframe
+                    src={hiwot.videoLink}
+                    className="absolute top-0 left-0 w-full h-full"
+                    title="Applicant Video"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+                <div className="flex justify-end">
+                  <a
+                    href={hiwot.videoLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <ExternalLink size={16} />
+                      <span>Open Video</span>
+                    </Button>
+                  </a>
+                </div>
+              </div>
 
-                <TabsContent value="story" className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-bold mb-4">
-                      {applicant.firstName}'s Story
-                    </h2>
-                    <p className="text-gray-600 mb-6">
-                      {applicant.firstName} is seeking financial assistance for
-                      medical treatment. {applicant.description}
-                      and needs support from the community to cover the medical
-                      expenses. Your contribution can make a significant
-                      difference in {applicant.firstName}'s life and recovery
-                      journey.
-                    </p>
-                    <div className="space-y-6">
-                      <h2 className="text-xl font-bold mb-4">Video Message</h2>
-                      <div className="relative pt-[56.25%] bg-gray-100 rounded-lg overflow-hidden">
-                        <iframe
-                          src={applicant.videoLink.replace(
-                            "watch?v=",
-                            "embed/"
-                          )}
-                          className="absolute top-0 left-0 w-full h-full"
-                          title="Applicant Video"
-                          allowFullScreen
-                        ></iframe>
-                      </div>
-                      <div className="flex justify-end">
-                        <Button
-                          variant="outline"
-                          className="flex items-center gap-2"
-                        >
-                          <ExternalLink size={16} />
-                          <span>Open in YouTube</span>
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <h3 className="font-medium mb-2"> Condition</h3>
-                      <p className="text-gray-600">
-                        {applicant.description} The treatment requires
-                        significant financial resources that are beyond
-                        {applicant.firstName}'s current means. With your help,{" "}
-                        {applicant.firstName} can receive the necessary medical
-                        care and have a chance at recovery.
-                      </p>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="document">
-                  <div className="space-y-6">
-                    <h2 className="text-xl font-bold mb-4">
-                      Medical Documents
-                    </h2>
-                    <div className="space-y-4">
-                      {applicant.medicalDocuments.map((doc, index) => (
-                        <div
-                          key={index}
-                          className="bg-gray-50 p-4 rounded-lg flex items-center justify-between"
-                        >
-                          <div className="flex items-center">
-                            <FileText className="h-5 w-5 text-blue-500 mr-3" />
-                            <span>Medical Document {index + 1}</span>
-                          </div>
-                          <a
-                            href={doc}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            View
-                          </a>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
-                      <div className="flex items-center">
-                        <FileText className="h-5 w-5 text-blue-500 mr-3" />
-                        <span>National ID</span>
-                      </div>
-                      <a
-                        href={applicant.nationalId}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        View
-                      </a>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+              <div className="bg-blue-50 p-4 rounded-lg mt-6">
+                <h3 className="font-medium mb-2">Condition</h3>
+                <p className="text-gray-600">{hiwot.description}</p>
+              </div>
             </div>
 
             <div className="bg-white rounded-lg shadow-sm p-6">
@@ -355,52 +271,139 @@ export default function HiwotDetailPage() {
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm text-gray-600">
-                    ETB {Number.parseInt(applicant.goalFund).toLocaleString()}
+                    ETB {Number(hiwot.fundingGoal).toLocaleString()}
                   </span>
                   <span className="text-sm font-medium">
-                    {applicant.fundingProgress}% Funded
+                    {hiwot.fundingProgress}% Funded
                   </span>
                 </div>
-                <Progress
-                  value={applicant.fundingProgress || 0}
-                  className="h-2"
-                />
+                <Progress value={hiwot.fundingProgress || 0} className="h-2" />
               </div>
 
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-800">
-                    {applicant.supporters}
+                    {hiwot.backersCount}
                   </div>
                   <div className="text-sm text-gray-600">Supporters</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-800">
-                    {applicant.postDuration}
+                    {daysToGo}
                   </div>
                   <div className="text-sm text-gray-600">Days to Go</div>
                 </div>
                 <div className="text-center">
                   <div className="text-xl font-bold text-gray-800">
-                    ETB{" "}
-                    {Number.parseInt(applicant.goalFund).toLocaleString(
-                      "en-ET"
-                    )}
+                    ETB {Number(hiwot.fundingGoal).toLocaleString("en-ET")}
                   </div>
                   <div className="text-sm text-gray-600">Goal</div>
                 </div>
               </div>
+              <PaymentDialog hiwotId={hiwot._id} type="hiwot">
+                <Button
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white mb-2"
+                  onClick={handleSupport}
+                >
+                  Support Now
+                </Button>
+              </PaymentDialog>
+              <div className="flex gap-4 items-center justify-between mt-2 w-full">
+                <Button
+                  variant="ghost"
+                  aria-label="Like"
+                  className="flex items-center gap-2 text-red-500 hover:bg-red-100 transition"
+                  onClick={handleLike}
+                  disabled={likeLoading}
+                >
+                  <Heart
+                    size={22}
+                    fill={isLiked ? "currentColor" : "none"}
+                    stroke="currentColor"
+                  />
+                  <span className="ml-1 text-base font-semibold">
+                    {localLikesCount}
+                  </span>
+                  {likeLoading ? "..." : isLiked ? "Liked" : "Like"}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 bg-transparent"
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                  }}
+                >
+                  <ExternalLink size={20} />
+                  Share Link
+                </Button>
+              </div>
+            </div>
 
-              <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">
-                Support Now
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-center gap-2 mt-3"
-              >
-                <Heart size={16} />
-                <span>Share with Friends</span>
-              </Button>
+            {/* Comments Section */}
+            <div className="w-full mt-12 bg-gradient-to-r from-blue-100 to-blue-300 rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <MessageSquare className="text-blue-500" size={20} />
+                Community Discussion
+              </h2>
+              {/* Comments List */}
+              <div className="space-y-6 mb-6">
+                {commentsLoading ? (
+                  <p className="text-gray-500 text-center py-4">
+                    Loading comments...
+                  </p>
+                ) : commentsError ? (
+                  <p className="text-red-500 text-center py-4">
+                    Failed to load comments.
+                  </p>
+                ) : comments.length > 0 ? (
+                  comments.map((comment) => (
+                    <div key={comment._id} className="flex gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                          {comment.author?.firstName?.[0] || "U"}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">
+                            {comment.author?.firstName &&
+                            comment.author?.lastName
+                              ? `${comment.author.firstName} ${comment.author.lastName}`
+                              : comment.author?.username ||
+                                comment.author?.email ||
+                                "Unknown"}
+                          </p>
+                          <span className="text-sm text-gray-500">
+                            {new Date(comment.createdAt).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 mt-1">{comment.content}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">
+                    No comments yet. Be the first to share your thoughts!
+                  </p>
+                )}
+              </div>
+              {/* Add Comment Box */}
+              <div className="mb-6">
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Share your thoughts about this project..."
+                  className="mb-3 border-black"
+                  disabled={postingComment}
+                />
+                <Button
+                  onClick={handleAddComment}
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={postingComment}
+                >
+                  {postingComment ? "Posting..." : "Post Comment"}
+                </Button>
+              </div>
             </div>
           </motion.div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, Globe, User, LogOut } from "lucide-react";
@@ -20,6 +20,8 @@ import logo from "@/public/logo/logo.png";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+// import { constants } from "buffer";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,7 +34,8 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const [selectedLang, setSelectedLand] = useState("EN");
-
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -50,11 +53,12 @@ export default function Navbar() {
     try {
       await logoutUser().unwrap();
       dispatch(logout());
+      router.push("/");
     } catch (error) {
       console.error("Logout failed:", error);
-      // Even if the API call fails, we still want to clear local state
       dispatch(logout());
     }
+    setShowLogoutModal(false);
   };
 
   return (
@@ -76,7 +80,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation & Search */}
-        <div className="hidden md:flex flex-col sm:flex-row items-center justify-center gap-4 min-w-2xl max-w-4xl pl-60">
+        {/* <div className="hidden md:flex flex-col sm:flex-row items-center justify-center gap-4 min-w-2xl max-w-4xl pl-60">
           <div className="relative w-full max-w-[400px]">
             <Search
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -90,10 +94,10 @@ export default function Navbar() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="hidden md:flex items-center space-x-4">
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
@@ -115,7 +119,7 @@ export default function Navbar() {
                 FR
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
 
           {isAuthenticated ? (
             <>
@@ -140,7 +144,7 @@ export default function Navbar() {
                 variant="destructive"
                 size="sm"
                 className="flex items-center gap-2"
-                onClick={handleLogout}
+                onClick={() => setShowLogoutModal(true)}
               >
                 <LogOut className="h-4 w-4" />
                 Logout
@@ -184,7 +188,7 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-md py-4 px-4 animate-in slide-in-from-top duration-300 z-50">
           {/* Mobile Search */}
-          <div className="mb-4 w-full">
+          {/* <div className="mb-4 w-full">
             <div className="relative w-full">
               <Search
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -198,7 +202,7 @@ export default function Navbar() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-          </div>
+          </div> */}
           <nav className="flex flex-col space-y-4">
             {pathname !== "/" && (
               <Link
@@ -295,6 +299,27 @@ export default function Navbar() {
               </Button>
             </div>
           </nav>
+        </div>
+      )}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-lg shadow-lg p-6 min-w-[300px]">
+            <h2 className="text-lg font-bold mb-4">Confirm Logout</h2>
+            <p className="mb-6 text-gray-700">
+              Are you sure you want to logout?
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowLogoutModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </header>

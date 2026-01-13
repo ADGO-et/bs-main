@@ -1,6 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 const features = [
   {
@@ -17,7 +20,12 @@ const features = [
   },
 ];
 
-export function BlogSection() {
+export function OtherFeatures() {
+  const router = useRouter();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const requiresAuth = (href: string) => ["/hiwot", "/job"].includes(href);
+  const resolveHref = (href: string) =>
+    !isAuthenticated && requiresAuth(href) ? "/auth/signin" : href;
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
@@ -40,6 +48,7 @@ export function BlogSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group cursor-pointer"
+              onClick={() => router.push(resolveHref(post.href))}
             >
               <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 hover:border-blue-300 transition-all h-full">
                 <span className="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm mb-3">
@@ -50,8 +59,16 @@ export function BlogSection() {
                 </h3>
                 <p className="text-gray-600 mb-4">{post.excerpt}</p>
                 <Link
-                  href={post.href}
+                  href={resolveHref(post.href)}
                   className="text-blue-500 font-medium inline-flex items-center gap-1"
+                  onClick={(e) => {
+                    const target = resolveHref(post.href);
+                    if (target !== post.href) {
+                      // prevent default navigation to protected route
+                      e.preventDefault();
+                      router.push(target);
+                    }
+                  }}
                 >
                   Explore now
                   <svg

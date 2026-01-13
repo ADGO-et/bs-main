@@ -5,7 +5,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { CheckCircle, Users, Target, Award } from "lucide-react";
-import imgg from "@/public/collab.svg";
+import imgg from "@/public/about3.png";
 
 
 export default function AboutPage() {
@@ -54,13 +54,12 @@ export default function AboutPage() {
             className="z-10"
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-blue-600">We&apos;re Changing How Funding Works</h2>
-            <p className="text-gray-700 mb-6 text-lg">Sigma Funding Solutions was founded with a simple mission: to make funding accessible to everyone. We believe that great ideas deserve support, regardless of where they come from.</p>
+            <p className="text-gray-700 mb-6 text-lg">BoleStarter Funding Solutions was founded with a simple mission: to make funding accessible to everyone. We believe that great ideas deserve support, regardless of where they come from.</p>
             <p className="text-gray-700 mb-6 text-lg">Our platform connects entrepreneurs, families, and businesses with the right funding solutions tailored to their unique needs. With over 10 years of experience in the financial industry, we&apos;ve helped thousands of clients achieve their goals.</p>
             <div className="space-y-4">
               {[
                 "Transparent funding process with no hidden fees",
                 "Dedicated support team available 24/7",
-                "Customized solutions for every client",
                 "Fast approval and disbursement process",
               ].map((item, index) => (
                 <motion.div
@@ -83,8 +82,8 @@ export default function AboutPage() {
             className="relative flex justify-center items-center"
           >
             <div className="absolute -top-8 -right-8 h-32 w-32 bg-gradient-to-tr from-blue-400 to-blue-300 rounded-full blur-2xl opacity-40 z-0"></div>
-            <div className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-xl border border-blue-100">
-              <Image src={imgg} alt="About Sigma Funding" fill className="object-cover" />
+            <div className="relative h-[400px] w-full overflow-hidden p-10">
+              <Image src={imgg} alt="About BoleStarter Funding" fill className="object-cover rounded-full" />
             </div>
           </motion.div>
         </div>
@@ -134,8 +133,8 @@ export default function AboutPage() {
             className="bg-gradient-to-r from-blue-500 to-blue-400 text-white px-8 py-6 rounded-2xl shadow-lg text-center max-w-xl"
           >
             <h4 className="text-2xl font-bold mb-2">Ready to get started?</h4>
-            <p className="mb-4">Join Sigma Funding Solutions and unlock new opportunities for your ideas and business.</p>
-            <a href="/auth" className="inline-block bg-white text-blue-600 font-semibold px-6 py-2 rounded-lg shadow hover:bg-blue-50 transition">Sign Up Now</a>
+            <p className="mb-4">Join BoleStarter Funding Solutions and unlock new opportunities for your ideas and business.</p>
+            <a href="/auth/signup" className="inline-block bg-white text-blue-600 font-semibold px-6 py-2 rounded-lg shadow hover:bg-blue-50 transition">Sign Up Now</a>
           </motion.div>
         </div>
       </div>

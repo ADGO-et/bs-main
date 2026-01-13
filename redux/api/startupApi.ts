@@ -1,14 +1,27 @@
-import { creatingStartupPayload, StartupApproval } from "@/types/startupApi";
+import {
+  creatingStartupPayload,
+  StartupApproval,
+  StartupCommentResponse,
+  StartupCommentsListResponse,
+  StartupFund,
+  StartupLikeResponse,
+} from "@/types/startupApi";
+import { creatingStartupWithBsTeamPayload } from "@/types/startupApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_BASE_URL } from "./baseUrl";
 
 export const startupApi = createApi({
   reducerPath: "startupApi",
   baseQuery: fetchBaseQuery({
-    // baseUrl: "https://bole.weytech.et:5002", // production
-    baseUrl: "http://localhost:5002", // local development
+    baseUrl: API_BASE_URL,
     // credentials: "include",
-    prepareHeaders: (headers) => {
-      headers.set("Content-Type", `application/json`);
+    prepareHeaders: (headers, { getState }) => {
+      headers.set("Content-Type", "application/json");
+      // Get token from Redux state
+      const token = (getState() as any).auth.accessToken;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
       return headers;
     },
   }),
@@ -16,14 +29,24 @@ export const startupApi = createApi({
   tagTypes: [],
   endpoints: (builder) => ({
     // create a new startup
-    createStartup: builder.mutation<any, creatingStartupPayload>({
+    createStartupself: builder.mutation<any, creatingStartupPayload>({
       query: (startup) => ({
-        url: "/startup",
+        url: "/startup/self",
         method: "POST",
         body: startup,
       }),
     }),
 
+    createStartupByBsTeam: builder.mutation<
+      any,
+      creatingStartupWithBsTeamPayload
+    >({
+      query: (startup) => ({
+        url: "/startup/bole",
+        method: "POST",
+        body: startup,
+      }),
+    }),
     // get all startups (this is for the admin only)
     getAllStartups: builder.query<any, void>({
       query: () => ({
@@ -95,11 +118,49 @@ export const startupApi = createApi({
         method: "DELETE",
       }),
     }),
+
+    getStartupComments: builder.query<StartupCommentsListResponse, string>({
+      query: (startupId) => `/startup/comments/${startupId}`,
+    }),
+
+    postStartupComment: builder.mutation<
+      StartupCommentResponse,
+      { startupId: string; content: string }
+    >({
+      query: ({ startupId, content }) => ({
+        url: `/startup/comments/${startupId}`,
+        method: "POST",
+        body: { content },
+      }),
+    }),
+
+    likeOrDislikeStartup: builder.mutation<StartupLikeResponse, string>({
+      query: (id) => ({
+        url: `/startup/${id}/like`,
+        method: "PATCH",
+      }),
+    }),
+
+    FundStartup: builder.mutation<any, { id: string; fund: StartupFund }>({
+      query: ({ id, fund }) => ({
+        url: `/startup/${id}/fund`,
+        method: "PATCH",
+        body: fund,
+      }),
+    }),
+
+    verifyPayment: builder.query<any, string>({
+      query: (tx_ref) => ({
+        url: `payments/verify/${tx_ref}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
 export const {
-  useCreateStartupMutation,
+  useCreateStartupselfMutation,
+  useCreateStartupByBsTeamMutation,
   useGetAllStartupsQuery,
   useGetAllVerifiedStartupsQuery,
   useGetAllUnverifiedStartupsQuery,
@@ -108,4 +169,9 @@ export const {
   useUpdateStartupApprovalMutation,
   useUpdateStartupMutation,
   useDeleteStartupMutation,
+  useGetStartupCommentsQuery,
+  usePostStartupCommentMutation,
+  useLikeOrDislikeStartupMutation,
+  useFundStartupMutation,
+  useVerifyPaymentQuery,
 } = startupApi;

@@ -26,7 +26,7 @@ export default function BlogCard({
   title,
   // secondaryHeading,
   description,
-  // image,
+  image,
   // videoLink,
   // referenceLink,
   author = "Admin",
@@ -48,7 +48,7 @@ export default function BlogCard({
         <Link href={`/blog/${id}`} className="block">
           <div className="relative h-48 w-full overflow-hidden">
             <Image
-              src={imgg}
+              src={image}
               alt={title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
